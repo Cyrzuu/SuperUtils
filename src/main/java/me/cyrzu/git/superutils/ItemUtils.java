@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
@@ -16,10 +17,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @UtilityClass
 public class ItemUtils {
+
+    private static final UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private static final String url = "http://textures.minecraft.net/texture/";
 
     private static final Class<?> NBT_TAG_COMPOUND = ReflectionUtils.getClass("net.minecraft.nbt", "NBTTagCompound");
     private static final Class<?> CRAFT_ITEM_STACK = ReflectionUtils.getClass("org.bukkit.craftbukkit." + Version.getCurrent() + ".inventory", "CraftItemStack");
@@ -74,9 +81,6 @@ public class ItemUtils {
         }
     }
 
-    private static final UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    private static final String url = "http://textures.minecraft.net/texture/";
-
     @NotNull
     public static ItemStack getCustomHead(@NotNull String value) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
@@ -114,6 +118,30 @@ public class ItemUtils {
         }
 
         return head;
+    }
+
+    @NotNull
+    public static String getDisplayName(@NotNull ItemStack stack) {
+        ItemMeta itemMeta = stack.getItemMeta();
+        return itemMeta != null && itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : stack.getType().name().toLowerCase().replace("_", " ");
+    }
+
+    @NotNull
+    public static List<String> getLore(@NotNull ItemStack stack) {
+        ItemMeta itemMeta = stack.getItemMeta();
+        return itemMeta != null && itemMeta.getLore() != null ? itemMeta.getLore() : new ArrayList<>();
+    }
+
+    public static void setItemMeta(@NotNull ItemStack stack, @NotNull Consumer<ItemMeta> function) {
+        if(stack.getType().isAir()) {
+            return;
+        }
+
+        ItemMeta itemMeta = stack.getItemMeta();
+        if(itemMeta != null) {
+            function.accept(itemMeta);
+            stack.setItemMeta(itemMeta);
+        }
     }
 
 }
