@@ -1,5 +1,9 @@
 package me.cyrzu.git.superutils.color.patterns.gradient;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+
 public record GradientCalculate(@NotNull Color startColor, @NotNull Color endColor, int lowerRange, int upperRange) {
 
     public Color colorAt(int step) {
