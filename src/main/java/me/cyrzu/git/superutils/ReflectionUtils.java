@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -71,6 +72,30 @@ public class ReflectionUtils {
         } catch (NoSuchMethodException e) {
             Class<?> superClass = clazz.getSuperclass();
             return superClass == null ? null : getMethod(superClass, fieldName);
+        }
+    }
+
+    @Nullable
+    public static Field getField(@NotNull Class<?> clazz, @NotNull String fieldName, boolean accessible) {
+        try {
+            Field field = clazz.getField(fieldName);
+            if(accessible) {
+                field.setAccessible(true);
+            }
+
+            return field;
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldValue(@NotNull Field field, @NotNull Object object, @NotNull Class<T> clazz) {
+        try {
+            return (T) field.get(object);
+        } catch (Exception e) {
+            return null;
         }
     }
 
