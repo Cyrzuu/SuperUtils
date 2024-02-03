@@ -1,6 +1,6 @@
 Wow coooooo 😮😎
 
-[![](https://jitpack.io/v/Cyrzuu/SuperUtils.svg)](https://jitpack.io/#Cyrzuu/SuperMenu)
+[![](https://jitpack.io/v/Cyrzuu/SuperUtils.svg)](https://jitpack.io/#Cyrzuu/SuperUtils)
 
 **Maven:**
 ```xml
