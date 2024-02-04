@@ -12,7 +12,7 @@ Wow coooooo 😮😎
 <dependency>
     <groupId>com.github.Cyrzuu</groupId>
     <artifactId>SuperUtils</artifactId>
-    <version>1.7</version>
+    <version>1.8</version>
 </dependency>
 ```
 
@@ -24,5 +24,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Cyrzuu:SuperUtils:1.7'
+    implementation 'com.github.Cyrzuu:SuperUtils:1.8'
 }

@@ -1,5 +1,6 @@
 package me.cyrzu.git.superutils;
 
+import lombok.Getter;
 import me.cyrzu.git.superutils.color.ColorUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -17,9 +18,11 @@ import java.util.*;
 
 public class StackBuilder {
 
+    @Getter
     @NotNull
     private final Material material;
 
+    @Getter
     @NotNull
     private final ItemMeta itemMeta;
 
@@ -29,10 +32,13 @@ public class StackBuilder {
     @NotNull
     private final List<String> lore = new ArrayList<>();
 
+    @Getter
     private boolean unbreakable = false;
 
+    @Getter
     private int customModelData = -1;
 
+    @Getter
     private int damage = -1;
 
     private final Map<Enchantment, Integer> enchantments;
@@ -152,6 +158,27 @@ public class StackBuilder {
         stack.addUnsafeEnchantments(enchantments);
 
         return stack;
+    }
+
+    @NotNull
+    public String getDisplayName() {
+        String displayName = this.displayName != null ? this.displayName : material.name().toLowerCase().replace("_", " ");
+        return ColorUtils.parseText(displayName);
+    }
+
+    @NotNull
+    public List<String> getLore() {
+        return Collections.unmodifiableList(this.lore);
+    }
+
+    @NotNull
+    public Map<Enchantment, Integer> getEnchantments() {
+        return Collections.unmodifiableMap(this.enchantments);
+    }
+
+    @NotNull
+    public Set<ItemFlag> getFlags() {
+        return Collections.unmodifiableSet(this.flags);
     }
 
 }
