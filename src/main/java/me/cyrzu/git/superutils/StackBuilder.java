@@ -162,7 +162,7 @@ public class StackBuilder {
 
     @NotNull
     public String getDisplayName() {
-        return this.displayName != null ? this.displayName : material.name().toLowerCase().replace("_", " ");
+        return this.displayName != null ? this.displayName : material.name().replace("_", " ").toLowerCase();
     }
 
     @NotNull
