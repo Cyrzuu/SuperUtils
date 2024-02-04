@@ -162,8 +162,7 @@ public class StackBuilder {
 
     @NotNull
     public String getDisplayName() {
-        String displayName = this.displayName != null ? this.displayName : material.name().toLowerCase().replace("_", " ");
-        return ColorUtils.parseText(displayName);
+        return this.displayName != null ? this.displayName : material.name().toLowerCase().replace("_", " ");
     }
 
     @NotNull
