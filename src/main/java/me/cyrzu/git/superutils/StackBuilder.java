@@ -146,9 +146,9 @@ public class StackBuilder {
             return new ItemStack(Material.AIR);
         }
 
-        if(displayName != null) {
-            itemMeta.setDisplayName(ColorUtils.parseText(displayName));
-        }
+        itemMeta.setDisplayName(displayName == null ?
+                null :
+                ColorUtils.parseText(displayName));
 
         List<String> lore = this.lore.stream().map(ColorUtils::parseText).toList();
         itemMeta.setLore(lore);
