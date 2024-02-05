@@ -165,6 +165,10 @@ public class StackBuilder {
         return this.displayName != null ? this.displayName : material.name().replace("_", " ").toLowerCase();
     }
 
+    public boolean hasDisplayName() {
+        return this.displayName != null;
+    }
+
     @NotNull
     public List<String> getLore() {
         return Collections.unmodifiableList(this.lore);
