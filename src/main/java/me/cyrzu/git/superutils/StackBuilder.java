@@ -98,6 +98,12 @@ public class StackBuilder {
         return this;
     }
 
+    public StackBuilder setLore(@NotNull List<String> lore) {
+        this.lore.clear();
+        this.lore.addAll(lore);
+        return this;
+    }
+
     public StackBuilder setUnbreakable(boolean unbreakable) {
         this.unbreakable = unbreakable;
         return this;
