@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class StackBuilder {
+public class StackBuilder implements Cloneable {
 
     @Getter
     @NotNull
@@ -196,4 +196,12 @@ public class StackBuilder {
         return Collections.unmodifiableSet(this.flags);
     }
 
+    @Override
+    public StackBuilder clone() {
+        try {
+            return (StackBuilder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error(e);
+        }
+    }
 }
