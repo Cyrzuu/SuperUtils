@@ -104,6 +104,12 @@ public class StackBuilder {
         return this;
     }
 
+    public StackBuilder setLore(@NotNull String... lore) {
+        this.lore.clear();
+        this.lore.addAll(Arrays.asList(lore));
+        return this;
+    }
+
     public StackBuilder setUnbreakable(boolean unbreakable) {
         this.unbreakable = unbreakable;
         return this;
