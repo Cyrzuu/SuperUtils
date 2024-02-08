@@ -66,11 +66,21 @@ public class Values<T> {
 
     @NotNull
     public T next() {
-        double randomValue = random.nextDouble() * total;
-        return elements.entrySet().stream()
-                .reduce((acc, entry) -> randomValue > 0 && randomValue <= acc.getValue() ? acc : entry)
-                .map(Map.Entry::getKey)
-                .orElse(defaultValue);
+        if (elements.isEmpty()) {
+            return defaultValue;
+        }
+
+        double randomNumber = random.nextDouble() * total;
+        double percent = 0D;
+
+        for (Map.Entry<T, Double> entry : elements.entrySet()) {
+            percent += entry.getValue();
+            if (randomNumber < percent) {
+                return entry.getKey();
+            }
+        }
+
+        return defaultValue;
     }
 
 }
