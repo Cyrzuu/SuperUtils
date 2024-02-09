@@ -12,7 +12,7 @@ Wow coooooo 😮😎
 <dependency>
     <groupId>com.github.Cyrzuu</groupId>
     <artifactId>SuperUtils</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ```
 
