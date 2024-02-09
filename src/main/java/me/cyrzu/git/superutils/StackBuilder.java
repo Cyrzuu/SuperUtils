@@ -139,8 +139,30 @@ public class StackBuilder implements Cloneable {
         return this;
     }
 
+    public StackBuilder clearEnchantments() {
+        this.enchantments.clear();
+        return this;
+    }
+
+    public StackBuilder setEnchantments(@NotNull Map<Enchantment, Integer> enchantments) {
+        this.enchantments.clear();
+        this.enchantments.putAll(enchantments);
+        return this;
+    }
+
     public StackBuilder addFlag(@NotNull ItemFlag flag) {
         this.flags.add(flag);
+        return this;
+    }
+
+    public StackBuilder clearFlags() {
+        this.enchantments.clear();
+        return this;
+    }
+
+    public StackBuilder setFlags(@NotNull Collection<ItemFlag> flags) {
+        this.flags.clear();
+        this.flags.addAll(flags);
         return this;
     }
 
