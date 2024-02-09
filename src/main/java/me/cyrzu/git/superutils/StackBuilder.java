@@ -36,6 +36,9 @@ public class StackBuilder implements Cloneable {
     private boolean unbreakable = false;
 
     @Getter
+    private int ammount;
+
+    @Getter
     private int customModelData = -1;
 
     @Getter
@@ -63,6 +66,7 @@ public class StackBuilder implements Cloneable {
 
         this.enchantments = new LinkedHashMap<>(stack.getEnchantments());
         this.flags = new HashSet<>(this.itemMeta.getItemFlags());
+        this.ammount = stack.getAmount();
 
         List<String> lore = itemMeta.getLore();
         if(lore != null) {
@@ -107,6 +111,11 @@ public class StackBuilder implements Cloneable {
     public StackBuilder setLore(@NotNull String... lore) {
         this.lore.clear();
         this.lore.addAll(Arrays.asList(lore));
+        return this;
+    }
+
+    public StackBuilder setAmmount(int ammount) {
+        this.ammount = Math.max(1, ammount);
         return this;
     }
 
@@ -166,6 +175,7 @@ public class StackBuilder implements Cloneable {
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
         ItemStack stack = new ItemStack(material);
+        stack.setAmount(Math.min(ammount, 64));
         stack.setItemMeta(itemMeta);
         stack.addUnsafeEnchantments(enchantments);
 
