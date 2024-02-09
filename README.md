@@ -24,5 +24,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Cyrzuu:SuperUtils:1.9.0'
+    implementation 'com.github.Cyrzuu:SuperUtils:1.9.1'
 }
