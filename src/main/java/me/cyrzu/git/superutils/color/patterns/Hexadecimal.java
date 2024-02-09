@@ -11,14 +11,15 @@ public class Hexadecimal implements ColorPattern {
     private final Pattern pattern;
 
     public Hexadecimal() {
-        this.pattern = Pattern.compile("#[a-fA-F\\d]{6}");
+        this.pattern = Pattern.compile("&#[a-fA-F\\d]{6}");
     }
 
     @Override
     public @NotNull String parseText(@NotNull String text) {
         Matcher matcher = pattern.matcher(text);
         while (matcher.find()) {
-            text = text.replace(matcher.group(), ChatColor.of(matcher.group()).toString());
+            String group = matcher.group();
+            text = text.replace(group, ChatColor.of(group.substring(1)).toString());
         }
 
         return text;
