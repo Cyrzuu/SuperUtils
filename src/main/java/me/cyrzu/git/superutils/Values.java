@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class Values<T> {
 
@@ -42,6 +44,19 @@ public class Values<T> {
 
         total = elements.values().stream().mapToDouble(Double::doubleValue).sum();
         return this;
+    }
+
+    public boolean removeIf(BiPredicate<T, Double> filter) {
+        boolean removed = false;
+        Iterator<Map.Entry<T, Double>> each = elements.entrySet().iterator();
+        while (each.hasNext()) {
+            Map.Entry<T, Double> next = each.next();
+            if (filter.test(next.getKey(), next.getValue())) {
+                elements.remove(next.getKey());
+                removed = true;
+            }
+        }
+        return removed;
     }
 
     public boolean contains(@NotNull T value) {
