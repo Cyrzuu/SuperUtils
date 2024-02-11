@@ -37,8 +37,8 @@ public class LocationUtils {
         JsonObject object = new JsonObject();
         object.addProperty("world", location.getWorld().getName());
         object.addProperty("x", location.getBlockX());
-        object.addProperty("y", location.getBlockX());
-        object.addProperty("z", location.getBlockX());
+        object.addProperty("y", location.getBlockY());
+        object.addProperty("z", location.getBlockZ());
 
         return object.toString();
     }
