@@ -10,6 +10,14 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class MessageUtils {
 
+    public static void sendSuccess(@NotNull Player player, String message, @NotNull Object... format) {
+        send(player, ColorUtils.SUCCESS_COLOR + message, format);
+    }
+
+    public static void sendWarning(@NotNull Player player, String message, @NotNull Object... format) {
+        send(player, ColorUtils.ERROR_COLOR + message, format);
+    }
+
     public static void send(@NotNull Player player, String message, @NotNull Object... format) {
         player.sendMessage(parseMessage(message, format));
     }
