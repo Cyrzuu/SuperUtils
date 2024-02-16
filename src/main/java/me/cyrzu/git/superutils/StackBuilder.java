@@ -18,6 +18,19 @@ import java.util.*;
 
 public class StackBuilder implements Cloneable {
 
+    @NotNull
+    private static final ItemMeta DEFAULT_META;
+
+    static {
+        ItemStack stack = new ItemStack(Material.STONE);
+        ItemMeta meta = stack.getItemMeta();
+        if(meta == null) {
+            throw new RuntimeException("Meta is null");
+        }
+
+        DEFAULT_META = meta;
+    }
+
     @Getter
     @NotNull
     private final Material material;
@@ -58,7 +71,7 @@ public class StackBuilder implements Cloneable {
 
     public StackBuilder(@NotNull ItemStack stack, @Nullable ItemMeta itemMeta) {
         if(itemMeta == null) {
-            throw new RuntimeException("ItemMeta cannot be null");
+            itemMeta = DEFAULT_META;
         }
 
         this.material = stack.getType();
