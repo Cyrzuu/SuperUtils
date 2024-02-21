@@ -17,9 +17,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -64,6 +62,18 @@ public class ItemUtils {
         }
     }
 
+    @NotNull
+    public static String serializeArray(@NotNull ItemStack[] stacks) {
+        StringBuilder builder = new StringBuilder();
+        Arrays.stream(stacks)
+                .map(ItemUtils::serialize)
+                .filter(Objects::nonNull)
+                .forEach(s -> builder.append(s).append(","));
+
+        int length = builder.length();
+        return length <= 0 ? "" : builder.substring(0, length);
+    }
+
     @Nullable
     public static ItemStack deserialize(@NotNull String var0) {
         if(READ == null || OF == null || AS_BUKKIT_COPY == null) {
@@ -82,7 +92,15 @@ public class ItemUtils {
     }
 
     @NotNull
-    public static ItemStack getCustomHead(@NotNull String value) {
+    public static ItemStack[] deserializeArray(@NotNull String var0) {
+        return Arrays.stream(var0.split(","))
+                .map(ItemUtils::deserialize)
+                .filter(Objects::nonNull)
+                .toArray(ItemStack[]::new);
+    }
+
+    @NotNull
+        public static ItemStack getCustomHead(@NotNull String value) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         try {
             PlayerProfile playerProfile = Bukkit.createPlayerProfile(uuid);

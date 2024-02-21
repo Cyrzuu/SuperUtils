@@ -21,8 +21,12 @@ public class Values<T> {
     private double total = 0D;
 
     public Values(@NotNull T defaultValue) {
+        this(defaultValue, false);
+    }
+
+    public Values(@NotNull T defaultValue, boolean keepOrder) {
         this.defaultValue = defaultValue;
-        this.elements = new HashMap<>();
+        this.elements = keepOrder ? new LinkedHashMap<>() : new HashMap<>();
         this.random = new Random();
     }
 
