@@ -61,7 +61,7 @@ public abstract class AbstractCommand extends Command {
         return this;
     }
 
-    abstract void execute(@NotNull Player player, @NotNull CommandContext context);
+    public abstract void execute(@NotNull Player player, @NotNull CommandContext context);
 
     public void execute(@NotNull ConsoleCommandSender console, @NotNull CommandContext context) { }
 

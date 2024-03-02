@@ -19,7 +19,7 @@ public abstract class SubCommand {
         this.name = name;
     }
 
-    abstract public void run(@NotNull Player player, @NotNull CommandContext context);
+    public abstract void run(@NotNull Player player, @NotNull CommandContext context);
 
     public void run(@NotNull ConsoleCommandSender console, @NotNull CommandContext context) { }
 
