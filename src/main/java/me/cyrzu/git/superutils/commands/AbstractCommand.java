@@ -103,7 +103,7 @@ public abstract class AbstractCommand extends Command {
 
     @NotNull
     @Override
-    public final List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
+    public final List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location location) throws IllegalArgumentException {
         if(subCommands.isEmpty()) {
             return runTabComplete(sender, args);
         }
@@ -128,6 +128,12 @@ public abstract class AbstractCommand extends Command {
         }
 
         return new ArrayList<>();
+    }
+
+    @NotNull
+    @Override
+    public final List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
+        return tabComplete(sender, alias, args, null);
     }
 
     public final void runCommand(@NotNull CommandSender sender, @NotNull String... args) {
@@ -166,6 +172,9 @@ public abstract class AbstractCommand extends Command {
         method.setAccessible(false);
 
         commandMap.register(plugin.getName().toLowerCase(), this);
+
+
+
         commands.put(getName(), this);
     }
 
@@ -318,11 +327,6 @@ public abstract class AbstractCommand extends Command {
         return super.setUsage(usage);
     }
 
-    @NotNull
-    @Override
-    public final List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location location) throws IllegalArgumentException {
-        return super.tabComplete(sender, alias, args);
-    }
 
     @Override
     public final String toString() {
