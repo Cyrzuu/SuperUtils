@@ -60,4 +60,26 @@ public class NumberUtils {
         }
     }
 
+    public static boolean longValue(@NotNull String value) {
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (NumberFormatException ignore) {
+            return false;
+        }
+    }
+
+    public static long parseLong(@NotNull String value) {
+        return parseLong(value, 0L);
+    }
+
+    public static long parseLong(@NotNull String value, long def) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
+
 }
