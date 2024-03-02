@@ -24,9 +24,9 @@ public abstract class AbstractCommand extends Command {
     @Nullable
     private static Plugin plugin;
 
-    private final static Map<String, Command> commands = new HashMap<>();
+    private final static Map<String, AbstractCommand> commands = new HashMap<>();
 
-    public static Collection<Command> getCommands() {
+    public static Collection<AbstractCommand> getCommands() {
         return commands.values();
     }
 
@@ -154,7 +154,7 @@ public abstract class AbstractCommand extends Command {
     }
 
     @SneakyThrows
-    public final void register(@NotNull Plugin plugin) {
+    public final void registerCommand(@NotNull Plugin plugin) {
         if(AbstractCommand.plugin == null) {
             AbstractCommand.plugin = plugin;
         }
@@ -170,7 +170,7 @@ public abstract class AbstractCommand extends Command {
     }
 
     @SneakyThrows
-    public final void unregister() {
+    public final void unregisterCommand() {
         if(plugin == null) {
             return;
         }
