@@ -126,12 +126,12 @@ public class CommandContext {
 
     @Nullable
     public OfflinePlayer asOfflinePlayer(int index) {
-        return OfflinePlayer(index, null);
+        return asOfflinePlayer(index, null);
     }
 
     @Nullable
     @Contract("_, !null -> !null")
-    public OfflinePlayer OfflinePlayer(int index, @Nullable Player def) {
+    public OfflinePlayer asOfflinePlayer(int index, @Nullable Player def) {
         String value = index < args.length ? args[index] : null;
         if(value == null) {
             return def;
