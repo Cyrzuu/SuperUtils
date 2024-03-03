@@ -173,8 +173,6 @@ public abstract class AbstractCommand extends Command {
 
         commandMap.register(plugin.getName().toLowerCase(), this);
 
-
-
         commands.put(getName(), this);
     }
 

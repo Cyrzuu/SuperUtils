@@ -19,11 +19,11 @@ public abstract class SubCommand {
         this.name = name;
     }
 
-    public abstract void run(@NotNull Player player, @NotNull CommandContext context);
+    public abstract void execute(@NotNull Player player, @NotNull CommandContext context);
 
-    public void run(@NotNull ConsoleCommandSender console, @NotNull CommandContext context) { }
+    public void execute(@NotNull ConsoleCommandSender console, @NotNull CommandContext context) { }
 
-    public void run(@NotNull CommandSender sender, @NotNull CommandContext context) { }
+    public void execute(@NotNull CommandSender sender, @NotNull CommandContext context) { }
 
     @NotNull
     public List<String> tabComplete(@NotNull Player player, @NotNull CommandContext context) {
@@ -39,12 +39,12 @@ public abstract class SubCommand {
         CommandContext context = new CommandContext(args);
 
         if(sender instanceof Player player) {
-            run(player, context);
+            execute(player, context);
         } else if(sender instanceof ConsoleCommandSender console) {
-            run(console, context);
+            execute(console, context);
         }
 
-        run(sender, context);
+        execute(sender, context);
     }
 
 }
