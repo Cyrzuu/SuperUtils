@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.atomic.AtomicLong;
 
 @UtilityClass
 public class NumberUtils {
@@ -81,5 +82,26 @@ public class NumberUtils {
         }
     }
 
+
+    public static long parseFancyNumber(String text) {
+        AtomicLong ammount = new AtomicLong();
+        try {
+            String[] parts = text.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+            for (int i = 0; i < parts.length; i += 2) {
+                long value = Long.parseLong(parts[i]);
+                String unit = parts[i + 1];
+
+                switch (unit) {
+                    case "k","t","thousand","tho" -> ammount.addAndGet(value * 1000);
+                    case "m","mln","milion" -> ammount.addAndGet(value * 1000000);
+                    default -> ammount.addAndGet(0);
+                }
+            }
+
+            return ammount.get();
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
 
 }

@@ -2,9 +2,7 @@ package me.cyrzu.git.superutils.commands;
 
 import lombok.SneakyThrows;
 import me.cyrzu.git.superutils.color.ColorUtils;
-import me.cyrzu.git.superutils.commands.annotations.Aliases;
-import me.cyrzu.git.superutils.commands.annotations.Permission;
-import me.cyrzu.git.superutils.commands.annotations.PermissionMessage;
+import me.cyrzu.git.superutils.commands.annotations.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -18,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractCommand extends Command {
 
@@ -32,6 +32,15 @@ public abstract class AbstractCommand extends Command {
 
     @NotNull
     private final Map<String, SubCommand> subCommands;
+
+    private final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
+
+    private long cooldown = 0;
+
+    private boolean opBypass;
+
+    @Nullable
+    private String cooldownMessage = null;
 
     public AbstractCommand(@NotNull String command) {
         super(command);
@@ -50,6 +59,17 @@ public abstract class AbstractCommand extends Command {
         if(this.getClass().isAnnotationPresent(Aliases.class)) {
             Aliases value = this.getClass().getAnnotation(Aliases.class);
             setAliases(Arrays.asList(value.value()));
+        }
+
+        if(this.getClass().isAnnotationPresent(Cooldown.class)) {
+            Cooldown value = this.getClass().getAnnotation(Cooldown.class);
+            this.cooldown = Math.max(0, value.unit().toMillis(value.amount()));
+            this.opBypass = value.opBypass();
+        }
+
+        if(this.getClass().isAnnotationPresent(CooldownMessage.class)) {
+            CooldownMessage value = this.getClass().getAnnotation(CooldownMessage.class);
+            this.cooldownMessage = ColorUtils.parseText(value.value());
         }
     }
 
@@ -81,6 +101,24 @@ public abstract class AbstractCommand extends Command {
 
     @Override
     public final boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        if(cooldown > 0 && sender instanceof Player player && (!opBypass || !player.isOp())) {
+            long current = System.currentTimeMillis();
+            UUID uuid = player.getUniqueId();
+            long cooldownExTime = cooldownMap.getOrDefault(uuid, 0L);
+
+            if(current < cooldownExTime) {
+                if(cooldownMessage == null) {
+                    return false;
+                }
+
+                long remaing = TimeUnit.MILLISECONDS.toSeconds(cooldownExTime - current);
+                player.sendMessage(cooldownMessage.replace("%sec", String.valueOf(remaing)));
+                return false;
+            }
+
+            cooldownMap.put(uuid, current + cooldown);
+        }
+
         if(subCommands.isEmpty() || args.length == 0) {
             runCommand(sender, args);
             return true;
@@ -138,7 +176,6 @@ public abstract class AbstractCommand extends Command {
 
     public final void runCommand(@NotNull CommandSender sender, @NotNull String... args) {
         CommandContext context = new CommandContext(args);
-
         if(sender instanceof Player player) {
             execute(player, context);
         } else if(sender instanceof ConsoleCommandSender console) {
