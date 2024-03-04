@@ -83,17 +83,22 @@ public class NumberUtils {
     }
 
 
-    public static long parseFancyNumber(String text) {
+    public static long parseFancyNumber(@NotNull String text) {
         AtomicLong ammount = new AtomicLong();
         try {
             String[] parts = text.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+            if(parts.length == 1) {
+                return parseLong(parts[0], 0L);
+            }
+
             for (int i = 0; i < parts.length; i += 2) {
-                long value = Long.parseLong(parts[i]);
+                long value = parseLong(parts[i], 0L);
                 String unit = parts[i + 1];
 
                 switch (unit) {
-                    case "k","t","thousand","tho" -> ammount.addAndGet(value * 1000);
-                    case "m","mln","milion" -> ammount.addAndGet(value * 1000000);
+                    case "k","t","tho","thousand","thousands" -> ammount.addAndGet(value * 1_000);
+                    case "m","mln","milion","milions" -> ammount.addAndGet(value * 1_000_000);
+                    case "b","bil","billion","billions" -> ammount.addAndGet(value * 1_000_000_000);
                     default -> ammount.addAndGet(0);
                 }
             }
