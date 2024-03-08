@@ -5,10 +5,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 @UtilityClass
 public class NumberUtils {
+
+    @NotNull
+    private final static Random random = new Random();
 
     public static double round(double value, int scale) {
         if(value <= 0) {
@@ -107,6 +111,10 @@ public class NumberUtils {
         } catch (Exception ignored) {
             return 0;
         }
+    }
+
+    public static int randomInteger(int min, int max) {
+        return min >= max ? min : random.nextInt(max + 1 - min) + min;
     }
 
 }
