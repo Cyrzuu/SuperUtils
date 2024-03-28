@@ -49,7 +49,7 @@ public class StackBuilder implements Cloneable {
     private boolean unbreakable = false;
 
     @Getter
-    private int ammount;
+    private int amount;
 
     @Getter
     private int customModelData = -1;
@@ -79,7 +79,7 @@ public class StackBuilder implements Cloneable {
 
         this.enchantments = new LinkedHashMap<>(stack.getEnchantments());
         this.flags = new HashSet<>(this.itemMeta.getItemFlags());
-        this.ammount = stack.getAmount();
+        this.amount = stack.getAmount();
 
         List<String> lore = itemMeta.getLore();
         if(lore != null) {
@@ -127,8 +127,8 @@ public class StackBuilder implements Cloneable {
         return this;
     }
 
-    public StackBuilder setAmmount(int ammount) {
-        this.ammount = Math.max(1, ammount);
+    public StackBuilder setAmount(int amount) {
+        this.amount = Math.max(1, amount);
         return this;
     }
 
@@ -144,6 +144,15 @@ public class StackBuilder implements Cloneable {
 
     public StackBuilder setDamage(@Nullable Integer damage) {
         this.damage = damage == null || damage < 0 ? -1 : damage;
+        return this;
+    }
+
+    public StackBuilder addEnchantment(@NotNull String enchantment, int level) {
+        Enchantment byName = Enchantment.getByName(enchantment.toUpperCase());
+        if(byName != null) {
+            addEnchantment(byName, level);
+        }
+
         return this;
     }
 
@@ -170,6 +179,18 @@ public class StackBuilder implements Cloneable {
 
     public StackBuilder clearFlags() {
         this.enchantments.clear();
+        return this;
+    }
+
+    public StackBuilder setFlags(@NotNull String... flags) {
+        try {
+            List<ItemFlag> list = Arrays.stream(flags)
+                    .map(v -> ItemFlag.valueOf(v.toUpperCase()))
+                    .toList();
+
+            setFlags(list);
+        } catch (Exception ignored) { }
+
         return this;
     }
 
@@ -210,7 +231,7 @@ public class StackBuilder implements Cloneable {
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
         ItemStack stack = new ItemStack(material);
-        stack.setAmount(Math.min(ammount, 64));
+        stack.setAmount(Math.min(amount, 64));
         stack.setItemMeta(itemMeta);
         stack.addUnsafeEnchantments(enchantments);
 
@@ -249,4 +270,46 @@ public class StackBuilder implements Cloneable {
             throw new Error(e);
         }
     }
+
+    @NotNull
+    public static StackBuilder parseString(@NotNull String text) {
+        String[] s = text.split(" ");
+        Material material = Material.matchMaterial(text);
+        if(s.length == 1) {
+            return new StackBuilder(material == null || material.isAir() ? Material.STONE : material);
+        }
+
+        StackBuilder builder = new StackBuilder(material == null || material.isAir() ? Material.STONE : material);
+        for (int i = 1; i < s.length; i++) {
+            String[] split = s[i].split(":");
+
+            if(split.length == 1) {
+                continue;
+            }
+
+            String key = split[0].toLowerCase();
+            String value = split[1];
+
+            switch (key) {
+                case "name","displayname" -> builder.setName(value);
+                case "lore" -> builder.addLore(value.split(","));
+                case "custommodeldata","cmd","model" -> builder.setCustomModelData(NumberUtils.parseInteger(value, 1));
+                case "amount","ammount" -> builder.setAmount(NumberUtils.parseInteger(value, 1));
+                case "damage","dmg" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
+                case "unbreakable","unbr","unb" -> builder.setUnbreakable(Boolean.parseBoolean(value));
+                case "flag","flags" -> builder.setFlags(value.split(","));
+                case "enchant","ench","enchantment" -> {
+                    String[] ench = value.split(",");
+                    if(ench.length == 1) {
+                        continue;
+                    }
+
+                    builder.addEnchantment(ench[0], NumberUtils.parseInteger(ench[1]));
+                }
+            }
+        }
+
+        return builder;
+    }
+
 }
