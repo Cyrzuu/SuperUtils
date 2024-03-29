@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class StackBuilder implements Cloneable {
+public class StackBuilder {
 
     @NotNull
     private static final ItemMeta DEFAULT_META;
@@ -148,7 +148,7 @@ public class StackBuilder implements Cloneable {
     }
 
     public StackBuilder addEnchantment(@NotNull String enchantment, int level) {
-        Enchantment byName = Enchantment.getByName(enchantment.toUpperCase());
+        Enchantment byName = Enchantment.getByKey(NamespacedKey.minecraft(enchantment.toLowerCase()));
         if(byName != null) {
             addEnchantment(byName, level);
         }
@@ -183,6 +183,11 @@ public class StackBuilder implements Cloneable {
     }
 
     public StackBuilder setFlags(@NotNull String... flags) {
+        if(Arrays.stream(flags).anyMatch(f -> f.equalsIgnoreCase("all"))) {
+            setFlags(Arrays.asList(ItemFlag.values()));
+            return this;
+        }
+
         try {
             List<ItemFlag> list = Arrays.stream(flags)
                     .map(v -> ItemFlag.valueOf(v.toUpperCase()))
@@ -262,19 +267,14 @@ public class StackBuilder implements Cloneable {
         return Collections.unmodifiableSet(this.flags);
     }
 
-    @Override
     public StackBuilder clone() {
-        try {
-            return (StackBuilder) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new Error(e);
-        }
+        return new StackBuilder(build());
     }
 
     @NotNull
     public static StackBuilder parseString(@NotNull String text) {
         String[] s = text.split(" ");
-        Material material = Material.matchMaterial(text);
+        Material material = Material.matchMaterial(s[0].toUpperCase());
         if(s.length == 1) {
             return new StackBuilder(material == null || material.isAir() ? Material.STONE : material);
         }
@@ -291,15 +291,15 @@ public class StackBuilder implements Cloneable {
             String value = split[1];
 
             switch (key) {
-                case "name","displayname" -> builder.setName(value);
-                case "lore" -> builder.addLore(value.split(","));
+                case "name","displayname" -> builder.setName(value.replace("_", " "));
+                case "lore" -> builder.addLore(Arrays.stream(value.split(",")).map(v -> v.replace("_", " ")).toList());
                 case "custommodeldata","cmd","model" -> builder.setCustomModelData(NumberUtils.parseInteger(value, 1));
-                case "amount","ammount" -> builder.setAmount(NumberUtils.parseInteger(value, 1));
+                case "amount" -> builder.setAmount(NumberUtils.parseInteger(value, 1));
                 case "damage","dmg" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
                 case "unbreakable","unbr","unb" -> builder.setUnbreakable(Boolean.parseBoolean(value));
                 case "flag","flags" -> builder.setFlags(value.split(","));
                 case "enchant","ench","enchantment" -> {
-                    String[] ench = value.split(",");
+                    String[] ench = value.split(";");
                     if(ench.length == 1) {
                         continue;
                     }
