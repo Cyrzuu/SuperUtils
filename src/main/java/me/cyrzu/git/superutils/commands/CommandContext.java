@@ -63,7 +63,7 @@ public class CommandContext {
     }
 
     public boolean isInt(int index) {
-        return asInt(index, Integer.MAX_VALUE) != Integer.MAX_VALUE;
+        return asInt(index, Integer.MIN_VALUE) != Integer.MIN_VALUE;
     }
 
     public long asLong(int index) {
@@ -76,7 +76,7 @@ public class CommandContext {
     }
 
     public boolean isLong(int index) {
-        return asLong(index, Long.MAX_VALUE) != Long.MAX_VALUE;
+        return asLong(index, Long.MIN_VALUE) != Long.MIN_VALUE;
     }
 
     public double asDouble(int index) {
@@ -95,7 +95,7 @@ public class CommandContext {
     }
 
     public boolean isDouble(int index) {
-        return asDouble(index, Double.MAX_VALUE) != Double.MAX_VALUE;
+        return asDouble(index, Double.MIN_VALUE) != Double.MIN_VALUE;
     }
 
     public boolean asBoolean(int index) {

@@ -96,7 +96,7 @@ public class CommandManager implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onPluginDisable(PluginDisableEvent event) {
+    private void onPluginDisable(PluginDisableEvent event) {
         if(!event.getPlugin().equals(plugin)) {
             return;
         }
