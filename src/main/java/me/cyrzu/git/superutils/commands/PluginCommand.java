@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface SubCommand {
+public interface PluginCommand {
 
     @NotNull
     String getName();
 
-    default void execute(@NotNull CommandSender commandSender, @NotNull CommandContext context) { }
+    default void execute(@NotNull CommandSender sender, @NotNull CommandContext context) { }
 
     default void execute(@NotNull ConsoleCommandSender console, @NotNull CommandContext context) { }
 
@@ -29,15 +29,6 @@ public interface SubCommand {
         return new ArrayList<>();
     }
 
-    default void usage(@NotNull CommandSender sender) { }
-
-    default boolean hasPermission(@NotNull CommandSender sender) {
-        return true;
-    }
-
-    @NotNull
-    default String permissionMessage() {
-        return "";
-    }
+    default void help(@NotNull CommandSender sender) { }
 
 }
