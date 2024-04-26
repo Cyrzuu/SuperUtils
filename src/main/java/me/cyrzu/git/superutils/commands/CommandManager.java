@@ -2,6 +2,7 @@ package me.cyrzu.git.superutils.commands;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import me.cyrzu.git.superutils.color.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -35,14 +36,25 @@ public class CommandManager implements Listener {
     public void register(@NotNull CommandBuilder builder) {
         String name = builder.getPluginCommand().getName().toLowerCase();
 
-        BukkitCommand bukkitCommand = new BukkitCommand(name, builder.pluginCommand);
+        BukkitCommand bukkitCommand = new BukkitCommand(name, builder.getPluginCommand());
         bukkitCommand.setSubCommands(builder.getSubCommands());
         bukkitCommand.setAliases(builder.getAliases());
         bukkitCommand.setPermission(builder.getPermission());
         bukkitCommand.setUsage(builder.getUsage());
         bukkitCommand.setDescription(builder.getDescription());
-        bukkitCommand.setCooldown(builder.getCooldown(), builder.getCooldownMessage());
+        bukkitCommand.setCooldown(builder.getCooldown(), ColorUtils.parseText(builder.getCooldownMessage()));
 
+        register(bukkitCommand);
+    }
+
+    @SneakyThrows
+    public void register(@NotNull PluginCommand pluginCommand) {
+        String name = pluginCommand.getName().toLowerCase();
+        register(new BukkitCommand(name, pluginCommand));
+    }
+
+    @SneakyThrows
+    private void register(@NotNull BukkitCommand bukkitCommand) {
         Method method = Bukkit.getServer().getClass().getMethod("getCommandMap");
         method.setAccessible(true);
 
@@ -50,7 +62,7 @@ public class CommandManager implements Listener {
         method.setAccessible(false);
 
         commandMap.register(plugin.getName().toLowerCase(), bukkitCommand);
-        commands.put(name, bukkitCommand);
+        commands.put(bukkitCommand.getName(), bukkitCommand);
     }
 
     public void unregisterCommands() {
@@ -58,11 +70,26 @@ public class CommandManager implements Listener {
     }
 
     @SneakyThrows
-    public void unregister(@NotNull BukkitCommand command) {
+    public void unregister(@NotNull PluginCommand command) {
+        this.unregister(command.getName());
+    }
+
+    @SneakyThrows
+    public void unregister(@NotNull String command) {
+        BukkitCommand bukkitCommand = this.commands.get(command);
+        if(bukkitCommand == null) {
+            return;
+        }
+
+        unregister(bukkitCommand);
+    }
+
+    @SneakyThrows
+    private void unregister(@NotNull BukkitCommand bukkitCommand) {
         final Map<String, Command> commands = getKnownCommands();
         final String name = plugin.getName().toLowerCase();
 
-        for (final String alias : command.getAliases()) {
+        for (final String alias : bukkitCommand.getAliases()) {
             commands.remove(name + ":" + alias);
             commands.remove(alias);
         }
@@ -73,7 +100,7 @@ public class CommandManager implements Listener {
         method.invoke(Bukkit.getServer());
         method.setAccessible(false);
 
-        String commandName = command.getName();
+        String commandName = bukkitCommand.getName();
         commands.remove(commandName);
         this.commands.remove(commandName);
     }
@@ -184,6 +211,5 @@ public class CommandManager implements Listener {
     public static CommandBuilder builderOf(@NotNull PluginCommand pluginCommand) {
         return new CommandBuilder(pluginCommand);
     }
-
 
 }
