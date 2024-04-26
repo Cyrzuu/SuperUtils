@@ -31,4 +31,9 @@ public interface PluginCommand {
 
     default void help(@NotNull CommandSender sender) { }
 
+    @NotNull
+    default List<SubCommand> getSubCommands() {
+        return new ArrayList<>();
+    }
+
 }

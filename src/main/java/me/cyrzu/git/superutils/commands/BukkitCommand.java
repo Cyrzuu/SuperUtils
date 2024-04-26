@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 class BukkitCommand extends Command {
 
@@ -31,8 +32,16 @@ class BukkitCommand extends Command {
     private String cooldownMessage = "";
 
     public BukkitCommand(@NotNull String name, @NotNull PluginCommand pluginCommand) {
+        this(name, pluginCommand, new ArrayList<>());
+    }
+
+    public BukkitCommand(@NotNull String name, @NotNull PluginCommand pluginCommand, @NotNull List<SubCommand> subCommands) {
         super(name);
         this.pluginCommand = pluginCommand;
+
+        if(!subCommands.isEmpty()) {
+            this.setSubCommands(subCommands.stream().collect(Collectors.toMap(SubCommand::getName, v -> v)));
+        }
 
         if(this.getClass().isAnnotationPresent(Permission.class)) {
             Permission value = this.getClass().getAnnotation(Permission.class);

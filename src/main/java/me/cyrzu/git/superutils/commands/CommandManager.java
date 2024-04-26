@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class CommandManager implements Listener {
 
@@ -50,7 +51,9 @@ public class CommandManager implements Listener {
     @SneakyThrows
     public void register(@NotNull PluginCommand pluginCommand) {
         String name = pluginCommand.getName().toLowerCase();
-        register(new BukkitCommand(name, pluginCommand));
+        BukkitCommand bukkitCommand = new BukkitCommand(name, pluginCommand, pluginCommand.getSubCommands());
+
+        register(bukkitCommand);
     }
 
     @SneakyThrows
