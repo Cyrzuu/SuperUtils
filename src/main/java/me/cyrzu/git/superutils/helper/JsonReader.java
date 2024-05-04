@@ -222,11 +222,24 @@ public class JsonReader {
     public static <T> JsonArray getArrayString(@NotNull Stream<T> stream, Function<T, String> function) {
         return getArrayString(stream.toList(), function);
     }
+
     @NotNull
     public static <T> JsonArray getArrayString(@NotNull Collection<T> collect, Function<T, String> function) {
         JsonArray array = new JsonArray();
         collect.forEach(object -> array.add(function.apply(object)));
         return array;
+    }
+
+    @NotNull
+    public static List<JsonReader> getArray(@NotNull JsonReader reader, @NotNull String key) {
+        JsonElement jsonElement = reader.jsonObject.get(key);
+        if(!(jsonElement instanceof JsonArray array)) {
+            return Collections.emptyList();
+        }
+
+        return array.asList().stream()
+            .map(element -> element instanceof JsonObject object ? object : null)
+            .filter(Objects::nonNull).map(JsonReader::new).toList();
     }
 
     @Override
