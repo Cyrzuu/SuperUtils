@@ -1,15 +1,14 @@
 package me.cyrzu.git.superutils.helper;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
 import me.cyrzu.git.superutils.EnumUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -21,6 +20,28 @@ public class JsonReader {
 
     private JsonReader(@NotNull JsonObject jsonObject) {
         this.jsonObject = jsonObject;
+    }
+
+    @NotNull
+    private Set<String> keySet() {
+        return jsonObject.keySet();
+    }
+
+    @NotNull
+    private Map<String, JsonReader> getKeyValues() {
+        Map<String, JsonReader> reader = new HashMap<>();
+
+        Set<String> keys = this.keySet();
+        for (String key : keys) {
+            JsonElement jsonElement = this.get(key);
+            if(!(jsonElement instanceof JsonObject object)) {
+                continue;
+            }
+
+            reader.put(key, new JsonReader(object));
+        }
+
+        return ImmutableMap.copyOf(reader);
     }
 
     @Nullable
