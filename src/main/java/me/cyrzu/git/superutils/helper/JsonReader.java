@@ -23,12 +23,12 @@ public class JsonReader {
     }
 
     @NotNull
-    private Set<String> keySet() {
+    public Set<String> keySet() {
         return jsonObject.keySet();
     }
 
     @NotNull
-    private Map<String, JsonReader> getKeyValues() {
+    public Map<String, JsonReader> getKeyValues() {
         Map<String, JsonReader> reader = new HashMap<>();
 
         Set<String> keys = this.keySet();
