@@ -1,7 +1,6 @@
 package me.cyrzu.git.superutils.helper;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
 import me.cyrzu.git.superutils.EnumUtils;
 import org.jetbrains.annotations.Contract;
@@ -124,6 +123,18 @@ public class JsonReader {
     }
 
     @NotNull
+    public JsonArray getJsonArray(@NotNull String path) {
+        return getJsonArray(path, new JsonArray());
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public JsonArray getJsonArray(@NotNull String path, @Nullable JsonArray def) {
+        JsonElement jsonElement = this.get(path);
+        return jsonElement instanceof JsonArray array ? array : def;
+    }
+
+    @NotNull
     public List<String> getListString(@NotNull String path) {
         return getListString(path, new ArrayList<>());
     }
@@ -131,33 +142,31 @@ public class JsonReader {
     @NotNull
     public List<String> getListString(@NotNull String path, @NotNull List<String> def) {
         try {
-            JsonElement element = get(path);
-            if(element == null) {
+            List<JsonElement> list = this.getList(path);
+            if(list == null) {
                 return def;
             }
 
-            JsonArray array = element.getAsJsonArray();
-            return array.asList().stream().map(JsonElement::getAsString).toList();
+            return list.stream().map(JsonElement::getAsString).toList();
         } catch (Exception e) {
             return def;
         }
     }
 
     @NotNull
-    public List<JsonReader> getListObjects(@NotNull String path) {
-        return getListObjects(path, new ArrayList<>());
+    public List<JsonReader> getListReader(@NotNull String path) {
+        return getListReader(path, new ArrayList<>());
     }
 
     @NotNull
-    public List<JsonReader> getListObjects(@NotNull String path, @NotNull List<JsonReader> def) {
+    public List<JsonReader> getListReader(@NotNull String path, @NotNull List<JsonReader> def) {
         try {
-            JsonElement element = get(path);
-            if(element == null) {
+            List<JsonElement> list = this.getList(path);
+            if(list == null) {
                 return def;
             }
 
-            JsonArray array = element.getAsJsonArray();
-            return array.asList().stream()
+            return list.stream()
                     .filter(JsonElement::isJsonObject)
                     .map(JsonElement::getAsJsonObject)
                     .map(JsonReader::parseObject)
@@ -168,6 +177,23 @@ public class JsonReader {
     }
 
     @Nullable
+    public List<JsonElement> getList(@NotNull String path) {
+        return this.getList(path, new ArrayList<>());
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public List<JsonElement> getList(@NotNull String path, @Nullable List<JsonElement> def) {
+        if(!(this.get(path) instanceof JsonArray array)) {
+            return def;
+        }
+
+        List<JsonElement> list = new ArrayList<>();
+        array.forEach(list::add);
+        return list;
+    }
+
+    @Nullable
     public JsonElement get(@NotNull String path) {
         return get(path, null);
     }
@@ -175,21 +201,26 @@ public class JsonReader {
     @Nullable
     @Contract("_, !null -> !null")
     public JsonElement get(@NotNull String path, @Nullable JsonElement def) {
-        JsonObject object = jsonObject;
+        JsonElement object = jsonObject;
         try {
             String[] array = path.split("\\.");
             int length = array.length;
+
             if(length == 1) {
-                return object.get(array[0]);
+                return jsonObject.get(array[0]);
             }
 
             int index = 0;
             for (String key : array) {
-                if(++index >= length) {
-                    return object.get(key);
+                if(!(object instanceof JsonObject obj)) {
+                    return def;
                 }
 
-                object = object.getAsJsonObject(key);
+                if(++index >= length) {
+                    return obj.get(key);
+                }
+
+                object = obj.get(key);
             }
         } catch (JsonSyntaxException ignored) { }
 
@@ -231,15 +262,15 @@ public class JsonReader {
     }
 
     @NotNull
-    public static List<JsonReader> getArray(@NotNull JsonReader reader, @NotNull String key) {
-        JsonElement jsonElement = reader.jsonObject.get(key);
-        if(!(jsonElement instanceof JsonArray array)) {
+    public static List<JsonReader> getArray(@NotNull JsonReader reader, @NotNull String path) {
+        List<JsonElement> list = reader.getList(path);
+        if(list == null) {
             return Collections.emptyList();
         }
 
-        return array.asList().stream()
-            .map(element -> element instanceof JsonObject object ? object : null)
-            .filter(Objects::nonNull).map(JsonReader::new).toList();
+        return list.stream()
+                .map(element -> element instanceof JsonObject object ? object : null)
+                .filter(Objects::nonNull).map(JsonReader::new).toList();
     }
 
     @Override
