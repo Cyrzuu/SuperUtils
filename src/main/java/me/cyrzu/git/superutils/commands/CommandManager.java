@@ -45,7 +45,7 @@ public class CommandManager implements Listener {
         bukkitCommand.setDescription(builder.getDescription());
         bukkitCommand.setCooldown(builder.getCooldown(), ColorUtils.parseText(builder.getCooldownMessage()));
 
-        register(bukkitCommand);
+        this.register(bukkitCommand);
     }
 
     @SneakyThrows
@@ -53,7 +53,7 @@ public class CommandManager implements Listener {
         String name = pluginCommand.getName().toLowerCase();
         BukkitCommand bukkitCommand = new BukkitCommand(name, pluginCommand, pluginCommand.getSubCommands());
 
-        register(bukkitCommand);
+        this.register(bukkitCommand);
     }
 
     @SneakyThrows

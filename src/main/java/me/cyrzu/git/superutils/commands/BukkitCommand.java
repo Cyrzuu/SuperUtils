@@ -43,27 +43,27 @@ class BukkitCommand extends Command {
             this.setSubCommands(subCommands.stream().collect(Collectors.toMap(SubCommand::getName, v -> v)));
         }
 
-        if(this.getClass().isAnnotationPresent(Permission.class)) {
+        if(pluginCommand.getClass().isAnnotationPresent(Permission.class)) {
             Permission value = this.getClass().getAnnotation(Permission.class);
             this.setPermission(value.value());
         }
 
-        if(this.getClass().isAnnotationPresent(PermissionMessage.class)) {
+        if(pluginCommand.getClass().isAnnotationPresent(PermissionMessage.class)) {
             PermissionMessage value = this.getClass().getAnnotation(PermissionMessage.class);
             this.setPermissionMessage(value.value());
         }
 
-        if(this.getClass().isAnnotationPresent(Aliases.class)) {
+        if(pluginCommand.getClass().isAnnotationPresent(Aliases.class)) {
             Aliases value = this.getClass().getAnnotation(Aliases.class);
             this.setAliases(Arrays.asList(value.value()));
         }
 
-        if(this.getClass().isAnnotationPresent(Cooldown.class)) {
+        if(pluginCommand.getClass().isAnnotationPresent(Cooldown.class)) {
             Cooldown value = this.getClass().getAnnotation(Cooldown.class);
             this.cooldown = Math.max(0, value.unit().toMillis(value.amount()));
         }
 
-        if(this.getClass().isAnnotationPresent(CooldownMessage.class)) {
+        if(pluginCommand.getClass().isAnnotationPresent(CooldownMessage.class)) {
             CooldownMessage value = this.getClass().getAnnotation(CooldownMessage.class);
             this.cooldownMessage = ColorUtils.parseText(value.value());
         }
