@@ -37,7 +37,7 @@ public class CommandManager implements Listener {
     public void register(@NotNull CommandBuilder builder) {
         String name = builder.getPluginCommand().getName().toLowerCase();
 
-        BukkitCommand bukkitCommand = new BukkitCommand(name, builder.getPluginCommand());
+        BukkitCommand bukkitCommand = new BukkitCommand(plugin, name, builder.getPluginCommand());
         bukkitCommand.setSubCommands(builder.getSubCommands());
         bukkitCommand.setAliases(builder.getAliases());
         bukkitCommand.setPermission(builder.getPermission());
@@ -51,7 +51,7 @@ public class CommandManager implements Listener {
     @SneakyThrows
     public void register(@NotNull PluginCommand pluginCommand) {
         String name = pluginCommand.getName().toLowerCase();
-        BukkitCommand bukkitCommand = new BukkitCommand(name, pluginCommand, pluginCommand.getSubCommands());
+        BukkitCommand bukkitCommand = new BukkitCommand(plugin, name, pluginCommand, pluginCommand.getSubCommands());
 
         this.register(bukkitCommand);
     }

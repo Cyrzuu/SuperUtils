@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Permission {
     @NotNull
-    String value() default "*";
+    String value();
 }

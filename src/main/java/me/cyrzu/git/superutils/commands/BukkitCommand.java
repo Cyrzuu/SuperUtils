@@ -4,9 +4,11 @@ import me.cyrzu.git.superutils.color.ColorUtils;
 import me.cyrzu.git.superutils.commands.annotations.*;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 class BukkitCommand extends Command {
+
+    @NotNull
+    private final Plugin owningPlugin;
 
     @NotNull
     private final PluginCommand pluginCommand;
@@ -31,12 +36,13 @@ class BukkitCommand extends Command {
     @NotNull
     private String cooldownMessage = "";
 
-    public BukkitCommand(@NotNull String name, @NotNull PluginCommand pluginCommand) {
-        this(name, pluginCommand, new ArrayList<>());
+    public BukkitCommand(@NotNull Plugin owningPlugin, @NotNull String name, @NotNull PluginCommand pluginCommand) {
+        this(owningPlugin, name, pluginCommand, new ArrayList<>());
     }
 
-    public BukkitCommand(@NotNull String name, @NotNull PluginCommand pluginCommand, @NotNull List<SubCommand> subCommands) {
+    public BukkitCommand(@NotNull Plugin owningPlugin, @NotNull String name, @NotNull PluginCommand pluginCommand, @NotNull List<SubCommand> subCommands) {
         super(name);
+        this.owningPlugin = owningPlugin;
         this.pluginCommand = pluginCommand;
 
         if(!subCommands.isEmpty()) {
@@ -44,27 +50,27 @@ class BukkitCommand extends Command {
         }
 
         if(pluginCommand.getClass().isAnnotationPresent(Permission.class)) {
-            Permission value = this.getClass().getAnnotation(Permission.class);
+            Permission value = pluginCommand.getClass().getAnnotation(Permission.class);
             this.setPermission(value.value());
         }
 
         if(pluginCommand.getClass().isAnnotationPresent(PermissionMessage.class)) {
-            PermissionMessage value = this.getClass().getAnnotation(PermissionMessage.class);
+            PermissionMessage value = pluginCommand.getClass().getAnnotation(PermissionMessage.class);
             this.setPermissionMessage(value.value());
         }
 
         if(pluginCommand.getClass().isAnnotationPresent(Aliases.class)) {
-            Aliases value = this.getClass().getAnnotation(Aliases.class);
+            Aliases value = pluginCommand.getClass().getAnnotation(Aliases.class);
             this.setAliases(Arrays.asList(value.value()));
         }
 
         if(pluginCommand.getClass().isAnnotationPresent(Cooldown.class)) {
-            Cooldown value = this.getClass().getAnnotation(Cooldown.class);
+            Cooldown value = pluginCommand.getClass().getAnnotation(Cooldown.class);
             this.cooldown = Math.max(0, value.unit().toMillis(value.amount()));
         }
 
         if(pluginCommand.getClass().isAnnotationPresent(CooldownMessage.class)) {
-            CooldownMessage value = this.getClass().getAnnotation(CooldownMessage.class);
+            CooldownMessage value = pluginCommand.getClass().getAnnotation(CooldownMessage.class);
             this.cooldownMessage = ColorUtils.parseText(value.value());
         }
     }
@@ -81,6 +87,14 @@ class BukkitCommand extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        if (!owningPlugin.isEnabled()) {
+            throw new CommandException("Cannot execute command '" + commandLabel + "' in plugin " + owningPlugin.getDescription().getFullName() + " - plugin is disabled.");
+        }
+
+        if (!testPermission(sender)) {
+            return true;
+        }
+
         if(cooldown > 0 && sender instanceof Player player && !player.isOp()) {
             long current = System.currentTimeMillis();
             UUID uuid = player.getUniqueId();
@@ -100,7 +114,7 @@ class BukkitCommand extends Command {
         }
 
         if(subCommands.isEmpty() || args.length == 0) {
-            execute(sender, args);
+            this.execute(sender, args);
             return true;
         }
 
