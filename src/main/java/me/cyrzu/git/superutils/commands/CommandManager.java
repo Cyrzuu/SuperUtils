@@ -3,9 +3,12 @@ package me.cyrzu.git.superutils.commands;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.cyrzu.git.superutils.color.ColorUtils;
+import me.cyrzu.git.superutils.helper.Lazy;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -14,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,8 +29,21 @@ public class CommandManager implements Listener {
     @NotNull
     private final Plugin plugin;
 
-    private CommandManager(@NotNull Plugin plugin) {
+    @Getter
+    @NotNull
+    private final Lazy<CommandMap> commandMap;
+
+    @NotNull
+    private final Lazy<Map<String, Command>> knownCommands;
+
+    public Lazy<Map<String, Command>> get() {
+        return knownCommands;
+    }
+
+    private CommandManager(@NotNull Plugin plugin, @NotNull Lazy<CommandMap> commandMap, @NotNull Lazy<Map<String, Command>> knownCommands) {
         this.plugin = plugin;
+        this.commandMap = commandMap;
+        this.knownCommands = knownCommands;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -58,14 +75,15 @@ public class CommandManager implements Listener {
 
     @SneakyThrows
     private void register(@NotNull BukkitCommand bukkitCommand) {
-        Method method = Bukkit.getServer().getClass().getMethod("getCommandMap");
-        method.setAccessible(true);
+        CommandMap commandMap = this.commandMap.get();
+        Map<String, Command> knownCommands = this.knownCommands.get();
 
-        CommandMap commandMap = (CommandMap) method.invoke(Bukkit.getServer());
-        method.setAccessible(false);
+        String label = bukkitCommand.getName().toLowerCase();
+        if(commandMap.getCommand(label) != null) {
+            this.knownCommands.get().remove(label);
+        }
 
-        commandMap.register(plugin.getName().toLowerCase(), bukkitCommand);
-        commands.put(bukkitCommand.getName(), bukkitCommand);
+        commandMap.register(label, plugin.getName().toLowerCase(), bukkitCommand);
     }
 
     public void unregisterCommands() {
@@ -89,7 +107,7 @@ public class CommandManager implements Listener {
 
     @SneakyThrows
     private void unregister(@NotNull BukkitCommand bukkitCommand) {
-        final Map<String, Command> commands = getKnownCommands();
+        final Map<String, Command> commands = this.knownCommands.get();
         final String name = plugin.getName().toLowerCase();
 
         for (final String alias : bukkitCommand.getAliases()) {
@@ -106,23 +124,6 @@ public class CommandManager implements Listener {
         String commandName = bukkitCommand.getName();
         commands.remove(commandName);
         this.commands.remove(commandName);
-    }
-
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    private Map<String, Command> getKnownCommands() {
-
-        final Method method = Bukkit.getServer().getClass().getMethod("getCommandMap");
-        method.setAccessible(true);
-
-        final CommandMap commandMap = (CommandMap) method.invoke(Bukkit.getServer());
-        method.setAccessible(false);
-        final Method method1 = commandMap.getClass().getMethod("getKnownCommands");
-
-        final Map<String, Command> commands = (Map<String, Command>) method1.invoke(commandMap);
-
-        method1.setAccessible(false);
-        return commands;
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -201,18 +202,46 @@ public class CommandManager implements Listener {
     private static CommandManager commandManager;
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public static CommandManager get(@NotNull Plugin plugin) {
         if(CommandManager.commandManager != null) {
             return CommandManager.commandManager;
 
         }
 
-        CommandManager.commandManager = new CommandManager(plugin);
+        Server server = plugin.getServer();
+        Lazy<CommandMap> commandMap = new Lazy<>(() -> {
+            try {
+                Field commandMapField = server.getClass().getDeclaredField("commandMap");
+
+                commandMapField.setAccessible(true);
+                return (CommandMap) commandMapField.get(server);
+            }
+            catch (NoSuchFieldException | IllegalAccessException exception) {
+                throw new RuntimeException(exception);
+            }
+        });
+
+        Lazy<Map<String, Command>> knownCommands = new Lazy<>(() -> {
+            try {
+                Field knownCommandMapField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+                knownCommandMapField.setAccessible(true);
+
+                return (Map<String, Command>) knownCommandMapField.get(commandMap.get());
+            }
+            catch (IllegalAccessException | NoSuchFieldException exception) {
+                throw new RuntimeException(exception);
+            }
+        });
+
+
+        CommandManager.commandManager = new CommandManager(plugin, commandMap, knownCommands);
         return CommandManager.commandManager;
     }
 
     public static CommandBuilder builderOf(@NotNull PluginCommand pluginCommand) {
         return new CommandBuilder(pluginCommand);
     }
+
 
 }
