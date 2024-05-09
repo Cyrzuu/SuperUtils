@@ -1,5 +1,7 @@
 package me.cyrzu.git.superutils.commands;
 
+import me.cyrzu.git.superutils.commands.annotations.CommandName;
+import me.cyrzu.git.superutils.commands.annotations.Permission;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -7,11 +9,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public interface PluginCommand {
 
     @NotNull
-    String getName();
+    default String getName() {
+        if(this.getClass().isAnnotationPresent(CommandName.class)) {
+            CommandName value = this.getClass().getAnnotation(CommandName.class);
+            return value.value();
+        }
+
+        return this.getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
+    }
 
     default void execute(@NotNull CommandSender sender, @NotNull CommandContext context) { }
 
