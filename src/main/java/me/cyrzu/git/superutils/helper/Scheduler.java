@@ -21,32 +21,60 @@ public class Scheduler {
         this.scheduler = Bukkit.getScheduler();
     }
 
-    public void async(@NotNull Runnable fun) {
-        scheduler.runTaskAsynchronously(plugin, fun);
+    public void asyncIf(@NotNull Runnable task, boolean async) {
+        if(async) {
+            this.async(task);
+        } else {
+            this.sync(task);
+        }
     }
 
-    public void later(int delay, @NotNull Runnable fun) {
-        scheduler.runTaskLater(plugin, fun, delay);
+    public void sync(@NotNull Runnable task) {
+        scheduler.runTask(plugin, task);
+    }
+    
+    public void async(@NotNull Runnable task) {
+        scheduler.runTaskAsynchronously(plugin, task);
     }
 
-    public void laterAsync(int delay, @NotNull Runnable fun) {
-        scheduler.runTaskLaterAsynchronously(plugin, fun, delay);
+    public void later(int delay, @NotNull Runnable task) {
+        scheduler.runTaskLater(plugin, task, delay);
     }
 
-    public void timer(int perioud, @NotNull Consumer<BukkitTask> fun) {
-        scheduler.runTaskTimer(plugin, fun, 0, perioud);
+    public void laterAsync(int delay, @NotNull Runnable task) {
+        scheduler.runTaskLaterAsynchronously(plugin, task, delay);
     }
 
-    public void timer(int perioud, int delay, @NotNull Consumer<BukkitTask> fun) {
-        scheduler.runTaskTimer(plugin, fun, delay, perioud);
+    public void timer(int perioud, @NotNull Runnable task) {
+        this.timer(perioud, t -> task.run());
+    }
+    
+    public void timer(int perioud, @NotNull Consumer<BukkitTask> task) {
+        scheduler.runTaskTimer(plugin, task, 0, perioud);
     }
 
-    public void timerAsync(int perioud, @NotNull Consumer<BukkitTask> fun) {
-        scheduler.runTaskTimerAsynchronously(plugin, fun, 0, perioud);
+    public void timer(int perioud, int delay, @NotNull Runnable task) {
+        this.timer(perioud, delay, t -> task.run());
+    }
+    
+    public void timer(int perioud, int delay, @NotNull Consumer<BukkitTask> task) {
+        scheduler.runTaskTimer(plugin, task, delay, perioud);
     }
 
-    public void timerAsync(int perioud, int delay, @NotNull Consumer<BukkitTask> fun) {
-        scheduler.runTaskTimerAsynchronously(plugin, fun, delay, perioud);
+    public void timerAsync(int perioud, @NotNull Runnable task) {
+        this.timerAsync(perioud, t -> task.run());
+    }
+    
+    public void timerAsync(int perioud, @NotNull Consumer<BukkitTask> task) {
+        scheduler.runTaskTimerAsynchronously(plugin, task, 0, perioud);
+    }
+
+    public void timerAsync(int perioud, int delay, @NotNull Runnable task) {
+        this.timerAsync(perioud, delay, t -> task.run());
+    }
+    
+    public void timerAsync(int perioud, int delay, @NotNull Consumer<BukkitTask> task) {
+        scheduler.runTaskTimerAsynchronously(plugin, task, delay, perioud);
     }
 
 }
