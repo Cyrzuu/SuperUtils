@@ -9,8 +9,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.profile.PlayerProfile;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,6 +64,9 @@ public class StackBuilder {
     private final Map<Enchantment, Integer> enchantments;
 
     private final Set<ItemFlag> flags;
+
+    @Nullable
+    private PlayerProfile headTexture;
 
     public StackBuilder(@NotNull Material material) {
         this(new ItemStack(material));
@@ -210,6 +217,11 @@ public class StackBuilder {
         return this;
     }
 
+    public StackBuilder setHeadTexture(@NotNull String texture) {
+        this.headTexture = ProfileUtils.getProfileTexture(texture);
+        return this;
+    }
+
     @NotNull
     public ItemStack build() {
         if(material.isAir()) {
@@ -239,6 +251,11 @@ public class StackBuilder {
         stack.setAmount(Math.min(amount, 64));
         stack.setItemMeta(itemMeta);
         stack.addUnsafeEnchantments(enchantments);
+
+        if(headTexture != null && itemMeta instanceof SkullMeta skullMeta) {
+            skullMeta.setOwnerProfile(headTexture);
+            stack.setItemMeta(skullMeta);
+        }
 
         return stack;
     }
@@ -273,13 +290,19 @@ public class StackBuilder {
 
     @NotNull
     public static StackBuilder parseString(@NotNull String text) {
+        return StackBuilder.parseString(text, new StackBuilder(Material.STONE));
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static StackBuilder parseString(@NotNull String text, @Nullable StackBuilder def) {
         String[] s = text.split(" ");
-        Material material = Material.matchMaterial(s[0].toUpperCase());
-        if(s.length == 1) {
-            return new StackBuilder(material == null || material.isAir() ? Material.STONE : material);
+        Material material = EnumUtils.getEnum(s[0], Material.class);
+        if(s.length == 1 || material == null || material.isAir()) {
+            return material != null && !material.isAir() ? new StackBuilder(material) : def;
         }
 
-        StackBuilder builder = new StackBuilder(material == null || material.isAir() ? Material.STONE : material);
+        StackBuilder builder = new StackBuilder(material.isAir() ? Material.STONE : material);
         for (int i = 1; i < s.length; i++) {
             String[] split = s[i].split(":");
 
@@ -298,6 +321,7 @@ public class StackBuilder {
                 case "damage","dmg" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
                 case "unbreakable","unbr","unb" -> builder.setUnbreakable(Boolean.parseBoolean(value));
                 case "flag","flags" -> builder.setFlags(value.split(","));
+                case "head","head_texture" -> builder.setHeadTexture(value);
                 case "enchant","ench","enchantment" -> {
                     String[] ench = value.split(";");
                     if(ench.length == 1) {

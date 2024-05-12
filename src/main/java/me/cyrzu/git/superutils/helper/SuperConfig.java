@@ -5,19 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.cyrzu.git.superutils.LocationUtils;
+import me.cyrzu.git.superutils.StackBuilder;
 import me.cyrzu.git.superutils.color.ColorUtils;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -28,6 +28,10 @@ public class SuperConfig {
 
     @NotNull
     public final static Pattern MESSAGE_PATTERN = Pattern.compile("messages?:\\s*\\w+");
+
+    @NotNull
+    public final static Pattern ITEM_PATTERN = Pattern.compile("item:\\w+");
+
 
     @NotNull
     private final Plugin plugin;
@@ -167,6 +171,22 @@ public class SuperConfig {
     }
 
     @Nullable
+    public ItemStack getItemStack(@NotNull String path) {
+        return this.getItemStack(path, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public ItemStack getItemStack(@NotNull String path, @Nullable ItemStack def) {
+        Object val = this.get(path + ".item", def);
+        if(!(val instanceof ItemStack item)) {
+            return def;
+        }
+
+        return item;
+    }
+
+    @Nullable
     public Object get(@NotNull String path) {
         return this.get(path, null);
     }
@@ -244,12 +264,26 @@ public class SuperConfig {
             return;
         }
 
-        Matcher matcher = SuperConfig.MESSAGE_PATTERN.matcher(string);
-        if(matcher.matches()) {
+        Matcher messagePattern = SuperConfig.MESSAGE_PATTERN.matcher(string);
+        if(messagePattern.matches()) {
             Message message = this.parseMessage(string.split(":")[1]);
             if(message != null) {
                 this.data.put(key, message);
                 return;
+            }
+        }
+
+        StackBuilder builder = StackBuilder.parseString(string, null);
+        if(builder != null) {
+            SuperConfig.createDefaultItemFile(new File(plugin.getDataFolder(), "item.json"));
+            this.data.put(key + ".item", builder.build());
+        }
+
+        Matcher itemPattern = SuperConfig.ITEM_PATTERN.matcher(string);
+        if(itemPattern.matches()) {
+            ItemConfig item = this.parseItem(string.split(":")[1]);
+            if(item != null) {
+                this.data.put(key + ".item", item.getItem());
             }
         }
 
@@ -260,7 +294,7 @@ public class SuperConfig {
     private Message parseMessage(@NotNull String id) {
         File messageJson = new File(plugin.getDataFolder(), "message.json");
         if(!messageJson.exists()) {
-            plugin.saveResource("message.json", false);
+            SuperConfig.createDefaultMessageFile(messageJson);
         }
 
         String json = FileUtils.readFileToString(messageJson);
@@ -270,11 +304,105 @@ public class SuperConfig {
         return messageReader != null ? new Message(messageReader) : null;
     }
 
+    @Nullable
+    private ItemConfig parseItem(@NotNull String id) {
+        File messageJson = new File(plugin.getDataFolder(), "item.json");
+        if(!messageJson.exists()) {
+            SuperConfig.createDefaultItemFile(messageJson);
+        }
+
+        String json = FileUtils.readFileToString(messageJson);
+        JsonReader reader = JsonReader.parseString(json);
+
+        JsonReader itemReader = reader == null ? null : reader.getReader(id);
+        return itemReader != null ? new ItemConfig(itemReader) : null;
+    }
+
     private boolean isPrimitiveWrapper(@Nullable Object input) {
         return input instanceof Integer || input instanceof Boolean
                 || input instanceof Character || input instanceof Byte
                 || input instanceof Short || input instanceof Double
                 || input instanceof Long || input instanceof Float;
+    }
+
+    private static void createDefaultMessageFile(@NotNull File file) {
+        FileUtils.createFile(file);
+        try(FileWriter writer = new FileWriter(file)) {
+            writer.append("""
+                    {
+                      "example1": {
+                        "message": "&7Example message :D",
+                        "sound": {
+                          "name": "ENTITY_EXPERIENCE_ORB_PICKUP",
+                          "volume": 0.5,
+                          "pitch": 1.25
+                        }
+                      },
+                      "example2": {
+                        "messages": [
+                          "&7First message",
+                          "&7Second message"
+                        ],
+                        "sound": {
+                          "name": "UI_BUTTON_CLICK"
+                        },
+                        "actionbar": "&7Cool acitonbar",
+                        "title": {
+                          "title": "First line",
+                          "subtitle": "Second line",
+                          "fadeIn": 0,
+                          "stay": 30,
+                          "fadeOut": 10
+                        }
+                      }
+                    }
+                    """);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void createDefaultItemFile(@NotNull File file) {
+        if(file.exists()) {
+            return;
+        }
+
+        FileUtils.createFile(file);
+        try(FileWriter writer = new FileWriter(file)) {
+            writer.append("""
+                    {
+                      "example1": {
+                        "type": "diamond sword",
+                        "name": "&7Displayed Name",
+                        "lore": [
+                          "&3First limne",
+                          "&3Second line"
+                        ],
+                        "custommodeldata": 1,
+                        "amount": 1,
+                        "damage": 20,
+                        "unbreakable": true,
+                        "flags": [
+                          "HIDE_ENCHANTS",
+                          "HIDE_UNBREAKABLE"
+                        ],
+                        "enchants": {
+                          "sharpness": 6,
+                          "unbreaking": 4
+                        }
+                      },
+                      "example2": {
+                        "type": "player head",
+                        "head_texture": "95f7fa5de933e26bdc36800099f752f65bce135a003cb050b1537b75026f816c",
+                        "flags": [
+                          "ALL"
+                        ]
+                      }
+                    }
+                    """);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
