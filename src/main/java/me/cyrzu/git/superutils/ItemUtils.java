@@ -44,7 +44,7 @@ public class ItemUtils {
     @Nullable
     public static String serialize(@NotNull ItemStack stack) {
         if(AS_NMS_COPY == null || SAVE == null || WRITE == null) {
-            throw new RuntimeException();
+            throw new NullPointerException();
         }
 
         try {
@@ -77,7 +77,7 @@ public class ItemUtils {
     @Nullable
     public static ItemStack deserialize(@NotNull String var0) {
         if(READ == null || OF == null || AS_BUKKIT_COPY == null) {
-            throw new RuntimeException();
+            throw new NullPointerException();
         }
 
         try {
@@ -100,7 +100,7 @@ public class ItemUtils {
     }
 
     @NotNull
-        public static ItemStack getCustomHead(@NotNull String value) {
+    public static ItemStack getCustomHead(@NotNull String value) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         try {
             PlayerProfile playerProfile = Bukkit.createPlayerProfile(uuid);
@@ -123,7 +123,7 @@ public class ItemUtils {
 
     @NotNull
     public static ItemStack getPlayerHead(@NotNull UUID uuid) {
-        return getPlayerHead(Bukkit.getOfflinePlayer(uuid));
+        return ItemUtils.getPlayerHead(Bukkit.getOfflinePlayer(uuid));
     }
 
     @NotNull

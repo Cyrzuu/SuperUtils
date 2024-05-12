@@ -1,41 +1,68 @@
 package me.cyrzu.git.superutils;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.experimental.UtilityClass;
+import me.cyrzu.git.superutils.helper.JsonReader;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @UtilityClass
 public class LocationUtils {
 
-    @NotNull
+    @Nullable
     public static String serialize(@NotNull Location location) {
+        return LocationUtils.serialize(location, 3, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static String serialize(@NotNull Location location, @Nullable String def) {
+        return LocationUtils.serialize(location, 3, def);
+    }
+
+    @Nullable
+    public static String serialize(@NotNull Location location, int round) {
+        return LocationUtils.serialize(location, round, null);
+    }
+
+    @Nullable
+    @Contract("_, _, !null -> !null")
+    public static String serialize(@NotNull Location location, int round, @Nullable String def) {
         if(location.getWorld() == null) {
-            throw new RuntimeException("The location's world is undefined");
+            return def;
         }
 
         JsonObject object = new JsonObject();
         object.addProperty("world", location.getWorld().getName());
-        object.addProperty("x", NumberUtils.round(location.getX(), 4));
-        object.addProperty("y", NumberUtils.round(location.getY(), 4));
-        object.addProperty("z", NumberUtils.round(location.getZ(), 4));
+        object.addProperty("x", NumberUtils.round(location.getX(), round));
+        object.addProperty("y", NumberUtils.round(location.getY(), round));
+        object.addProperty("z", NumberUtils.round(location.getZ(), round));
         object.addProperty("yaw", NumberUtils.round(location.getYaw(), 2));
         object.addProperty("pitch", NumberUtils.round(location.getPitch(), 2));
 
         return object.toString();
     }
 
-    @NotNull
+    @Nullable
     public static String serializeBlock(@NotNull Location location) {
-        if(location.getWorld() == null) {
-            throw new RuntimeException("The location's world is undefined");
+        return LocationUtils.serializeBlock(location, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static String serializeBlock(@NotNull Location location, @Nullable String def) {
+        World world = location.getWorld();
+        if(world == null) {
+            return def;
         }
 
         JsonObject object = new JsonObject();
-        object.addProperty("world", location.getWorld().getName());
+        object.addProperty("world", world.getName());
         object.addProperty("x", location.getBlockX());
         object.addProperty("y", location.getBlockY());
         object.addProperty("z", location.getBlockZ());
@@ -43,45 +70,57 @@ public class LocationUtils {
         return object.toString();
     }
 
-    @NotNull
+    @Nullable
     public static Location deserialize(@Nullable String text) {
-        if(text == null) {
-            throw new RuntimeException("The string value must not be null");
+        return LocationUtils.deserialize(text, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static Location deserialize(@Nullable String text, @Nullable Location def) {
+        JsonReader reader = JsonReader.parseString(text == null ? "" : text);
+        if(reader == null) {
+            return def;
         }
 
-        JsonObject element = JsonParser.parseString(text).getAsJsonObject();
-        String world = element.get("world").getAsString();
-        if(Bukkit.getWorld(world) == null) {
-            throw new RuntimeException("There is no such world with that name");
+        World world = Bukkit.getWorld(reader.getString("world", "world"));
+        if(world == null) {
+            return def;
         }
 
         return new Location(
-                Bukkit.getWorld(element.get("world").getAsString()),
-                element.get("x").getAsDouble(),
-                element.get("y").getAsDouble(),
-                element.get("z").getAsDouble(),
-                element.get("yaw").getAsFloat(),
-                element.get("pitch").getAsFloat()
+                world,
+                reader.getDouble("x", 0),
+                reader.getDouble("y", 0),
+                reader.getDouble("z", 0),
+                (float) reader.getDouble("yaw", 0),
+                (float) reader.getDouble("pitch", 0)
         );
     }
 
-    @NotNull
+    @Nullable
     public static Location deserializeBlock(@Nullable String text) {
-        if(text == null) {
-            throw new RuntimeException("The string value must not be null");
+        return LocationUtils.deserializeBlock(text, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static Location deserializeBlock(@Nullable String text, @Nullable Location def) {
+        JsonReader reader = JsonReader.parseString(text == null ? "" : text);
+        if(reader == null) {
+            return def;
         }
 
-        JsonObject element = JsonParser.parseString(text).getAsJsonObject();
-        String world = element.get("world").getAsString();
-        if(Bukkit.getWorld(world) == null) {
-            throw new RuntimeException("There is no such world with that name");
+        World world = Bukkit.getWorld(reader.getString("world", "world"));
+        if(world == null) {
+            return def;
         }
 
         return new Location(
-                Bukkit.getWorld(element.get("world").getAsString()),
-                element.get("x").getAsInt(),
-                element.get("y").getAsInt(),
-                element.get("z").getAsInt()
+                world,
+                reader.getInt("x", 0),
+                reader.getInt("y", 0),
+                reader.getInt("z", 0)
         );
     }
 

@@ -194,6 +194,18 @@ public class JsonReader {
     }
 
     @Nullable
+    public JsonReader getReader(@NotNull String path) {
+        return this.getReader(path, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public JsonReader getReader(@NotNull String path, @Nullable JsonReader def) {
+        JsonElement jsonElement = this.get(path);
+        return jsonElement instanceof JsonObject object ? new JsonReader(object) : def;
+    }
+
+    @Nullable
     public JsonElement get(@NotNull String path) {
         return get(path, null);
     }
