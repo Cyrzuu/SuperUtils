@@ -1,8 +1,12 @@
 package me.cyrzu.git.superutils.helper;
 
+import me.cyrzu.git.superutils.ReflectionUtils;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Field;
 
 public record PlaySound(@NotNull Sound sound, float volume, float pitch) {
 
@@ -38,6 +42,19 @@ public record PlaySound(@NotNull Sound sound, float volume, float pitch) {
 
     public void play(@NotNull Player player,  @NotNull Number volume, @NotNull Number pitch) {
         player.playSound(player.getLocation(), sound, volume.floatValue(), pitch.floatValue());
+    }
+
+    public static PlaySound defaultOf(@Nullable String soundName) {
+        if(soundName == null) {
+            return null;
+        }
+
+        try {
+            Field field = PlaySound.class.getDeclaredField(soundName.toUpperCase().replace(" ", "_"));
+            return (PlaySound) field.get(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }
