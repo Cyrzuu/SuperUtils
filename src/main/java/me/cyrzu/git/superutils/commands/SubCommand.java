@@ -2,20 +2,24 @@ package me.cyrzu.git.superutils.commands;
 
 import me.cyrzu.git.superutils.commands.annotations.CommandName;
 import me.cyrzu.git.superutils.commands.annotations.Permission;
+import me.cyrzu.git.superutils.helper.CooldownManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public abstract class SubCommand {
 
     @Nullable
     public org.bukkit.permissions.Permission permission;
+
+    @NotNull
+    private final CooldownManager cooldown = new CooldownManager();
 
     public SubCommand() {
         String permission = this.getPermission();
@@ -67,6 +71,22 @@ public abstract class SubCommand {
     @NotNull
     public String permissionMessage() {
         return "";
+    }
+
+    protected final void setCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
+        this.cooldown.setCooldown(uuid, time, unit);
+    }
+
+    protected final void setCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
+        this.cooldown.setCooldown(player, time, unit);
+    }
+
+    protected final boolean hasCooldown(@NotNull UUID uuid) {
+        return this.cooldown.hasCooldown(uuid);
+    }
+
+    protected final boolean hasCooldown(@NotNull Player player) {
+        return this.cooldown.hasCooldown(player);
     }
 
 }
