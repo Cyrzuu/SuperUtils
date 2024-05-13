@@ -269,6 +269,7 @@ public class SuperConfig {
             return;
         }
 
+        SuperConfig.createDefaultMessageFile(new File(plugin.getDataFolder(), "message.json"));
         Matcher messagePattern = SuperConfig.MESSAGE_PATTERN.matcher(string);
         if(messagePattern.matches()) {
             Message message = this.parseMessage(string.split(":")[1]);
@@ -298,10 +299,6 @@ public class SuperConfig {
     @Nullable
     private Message parseMessage(@NotNull String id) {
         File messageJson = new File(plugin.getDataFolder(), "message.json");
-        if(!messageJson.exists()) {
-            SuperConfig.createDefaultMessageFile(messageJson);
-        }
-
         String json = FileUtils.readFileToString(messageJson);
         JsonReader reader = JsonReader.parseString(json);
 
@@ -331,6 +328,10 @@ public class SuperConfig {
     }
 
     private static void createDefaultMessageFile(@NotNull File file) {
+        if(file.exists()) {
+            return;
+        }
+
         FileUtils.createFile(file);
         try(FileWriter writer = new FileWriter(file)) {
             writer.append("""
