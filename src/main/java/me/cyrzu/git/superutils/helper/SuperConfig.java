@@ -154,6 +154,11 @@ public class SuperConfig {
             .toList();
     }
 
+    @NotNull
+    public Message getMessageOrEmpty(@NotNull String path) {
+        return this.getMessage(path, Message.EMPTY_MESSAGE);
+    }
+
     @Nullable
     public Message getMessage(@NotNull String path) {
         return this.getMessage(path, null);
