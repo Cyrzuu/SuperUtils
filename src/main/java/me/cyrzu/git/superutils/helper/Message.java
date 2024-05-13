@@ -44,9 +44,9 @@ public class Message {
         this.title = title == null ? null : new Title(title);
 
         JsonReader sound = reader.getReader("sound");
-        this.sound = sound == null ? null : new PlaySound(reader.getEnum("name", Sound.class, Sound.UI_BUTTON_CLICK),
-                reader.getDouble("volume", 1D),
-                reader.getDouble("pitch", 1D));
+        this.sound = sound == null ? null : new PlaySound(sound.getEnum("name", Sound.class, Sound.UI_BUTTON_CLICK),
+                sound.getDouble("volume", 1D),
+                sound.getDouble("pitch", 1D));
     }
 
     public void send(@NotNull Player player) {
