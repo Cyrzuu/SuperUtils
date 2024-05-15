@@ -49,7 +49,7 @@ public class WorldChunk {
 
     @NotNull
     public Chunk getBukkitChunk() {
-        return getBukkitWorld().getChunkAt(x >> 4, z >> 4);
+        return this. getBukkitWorld().getChunkAt(x, z);
     }
 
     @Override
