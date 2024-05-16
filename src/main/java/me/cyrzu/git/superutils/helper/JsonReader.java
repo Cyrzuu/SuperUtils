@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -19,6 +20,11 @@ public class JsonReader {
 
     private JsonReader(@NotNull JsonObject jsonObject) {
         this.jsonObject = jsonObject;
+    }
+
+    @NotNull
+    public JsonWriter toJsonWriter() {
+        return new JsonWriter(this.jsonObject.deepCopy());
     }
 
     @NotNull
@@ -237,6 +243,11 @@ public class JsonReader {
         } catch (JsonSyntaxException ignored) { }
 
         return def;
+    }
+
+    @Nullable
+    public static JsonReader parseFile(@NotNull File file) {
+        return JsonReader.parseString(FileUtils.readFileToString(file));
     }
 
     @Nullable

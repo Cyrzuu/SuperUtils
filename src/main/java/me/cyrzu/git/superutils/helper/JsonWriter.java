@@ -1,10 +1,10 @@
 package me.cyrzu.git.superutils.helper;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -57,6 +57,15 @@ public class JsonWriter {
 
     public JsonObject getCopy() {
         return json.deepCopy();
+    }
+
+    public void saveToFile(@NotNull File file, boolean pretty) {
+        FileUtils.createFile(file);
+        try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+            Gson gson = pretty ? new GsonBuilder().setPrettyPrinting().create() : new Gson();
+            gson.toJson(this.getCopy(), outputStreamWriter);
+        } catch (IOException ignore) {
+        }
     }
 
     public static void modify(@NotNull JsonObject json, @NotNull Consumer<JsonWriter> fun) {
