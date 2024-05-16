@@ -40,6 +40,7 @@ public class JsonWriter {
                 temp = newObj;
             }
         }
+
         if(value instanceof JsonElement value0) {
             temp.add(key, value0);
         } else if(value instanceof String value0) {
