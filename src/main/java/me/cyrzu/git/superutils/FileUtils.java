@@ -1,4 +1,4 @@
-package me.cyrzu.git.superutils.helper;
+package me.cyrzu.git.superutils;
 
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -32,7 +32,8 @@ public class FileUtils {
             return false;
         }
 
-        if(!file.getParentFile().exists() && !file.mkdirs()) {
+        File parent = file.getParentFile();
+        if(!parent.exists() && !parent.mkdirs()) {
             return false;
         }
 
