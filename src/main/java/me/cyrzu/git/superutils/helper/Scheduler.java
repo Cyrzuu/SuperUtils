@@ -25,7 +25,7 @@ public class Scheduler {
         if(async) {
             this.async(task);
         } else {
-            this.sync(task);
+            task.run();
         }
     }
 
