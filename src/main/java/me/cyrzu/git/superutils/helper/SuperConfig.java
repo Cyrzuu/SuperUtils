@@ -52,7 +52,14 @@ public class SuperConfig {
     @NotNull
     private final Map<String, Object> data;
 
+    public final boolean append;
+
     public SuperConfig(@NotNull Plugin plugin, @NotNull String resource) {
+        this(plugin, resource, true);
+    }
+
+    public SuperConfig(@NotNull Plugin plugin, @NotNull String resource, boolean append) {
+        this.append = append;
         this.resource = resource.endsWith(".yml") ? resource : resource + ".yml";
         this.file = new File(plugin.getDataFolder(), this.resource);
         if(!file.exists()) {
@@ -235,7 +242,7 @@ public class SuperConfig {
                 continue;
             }
 
-            if(!config.isSet(key)) {
+            if(!config.isSet(key) && append) {
                 config.set(key, object);
             }
         }
