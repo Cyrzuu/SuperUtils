@@ -222,7 +222,10 @@ public class SuperConfig {
             this.resourceConfig = YamlConfiguration.loadConfiguration(resourceReader);
         }
 
-        this.saveResource(this.config, this.resourceConfig);
+        if(append) {
+            this.saveResource(this.config, this.resourceConfig);
+        }
+
         this.config.save(this.file);
         this.loadConfiguration(this.config, "");
     }
@@ -242,7 +245,7 @@ public class SuperConfig {
                 continue;
             }
 
-            if(!config.isSet(key) && append) {
+            if(!config.isSet(key)) {
                 config.set(key, object);
             }
         }
