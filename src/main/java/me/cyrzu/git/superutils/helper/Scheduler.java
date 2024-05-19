@@ -61,7 +61,7 @@ public class Scheduler {
         scheduler.runTaskTimer(plugin, task, delay, perioud);
     }
 
-    public BukkitTask timerAsync(int perioud, @NotNull Runnable task) {
+    public BukkitTask timerAsync(@NotNull Runnable task, int perioud) {
         return scheduler.runTaskTimerAsynchronously(plugin, task, 0, perioud);
     }
     
