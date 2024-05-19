@@ -89,12 +89,12 @@ public class LocationUtils {
         }
 
         return new Location(
-                world,
-                reader.getDouble("x", 0),
-                reader.getDouble("y", 0),
-                reader.getDouble("z", 0),
-                (float) reader.getDouble("yaw", 0),
-                (float) reader.getDouble("pitch", 0)
+            world,
+            reader.getDouble("x", 0),
+            reader.getDouble("y", 0),
+            reader.getDouble("z", 0),
+            (float) reader.getDouble("yaw", 0),
+            (float) reader.getDouble("pitch", 0)
         );
     }
 

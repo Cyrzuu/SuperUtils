@@ -200,6 +200,22 @@ public class SuperConfig {
     }
 
     @Nullable
+    public Location getLocation(@NotNull String path) {
+        return this.getLocation(path, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public Location getLocation(@NotNull String path, @Nullable Location def) {
+        Object val = this.get(path + ".location", def);
+        if(!(val instanceof Location location)) {
+            return def;
+        }
+
+        return location;
+    }
+
+    @Nullable
     public Object get(@NotNull String path) {
         return this.get(path, null);
     }
@@ -276,8 +292,7 @@ public class SuperConfig {
 
         Location location = LocationUtils.deserialize(string);
         if(location != null) {
-            this.data.put(key, location);
-            return;
+            this.data.put(key + ".location", location);
         }
 
         SuperConfig.createDefaultMessageFile(new File(plugin.getDataFolder(), "message.json"));
