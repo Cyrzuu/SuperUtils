@@ -6,6 +6,7 @@ import me.cyrzu.git.superutils.color.ColorUtils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +52,15 @@ public class Message {
                 sound.getDouble("pitch", 1D));
     }
 
+    public void send(@NotNull CommandSender sender) {
+        if(sender instanceof Player player) {
+            this.send(player);
+            return;
+        }
+
+        sender.sendMessage(messages);
+    }
+
     public void send(@NotNull Player player) {
         if(messages.length != 0) {
             player.sendMessage(messages);
@@ -66,6 +76,17 @@ public class Message {
 
         if(sound != null) {
             sound.play(player);
+        }
+    }
+
+    public void send(@NotNull CommandSender sender, @NotNull ReplaceBuilder replacer, @NotNull Object... objects) {
+        if(sender instanceof Player player) {
+            this.send(player, replacer, objects);
+            return;
+        }
+
+        for (String message : messages) {
+            sender.sendMessage(replacer.replaceMessage(message, objects));
         }
     }
 
