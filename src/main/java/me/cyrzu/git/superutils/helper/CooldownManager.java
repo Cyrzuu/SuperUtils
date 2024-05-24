@@ -18,21 +18,22 @@ public class CooldownManager {
     public CooldownManager() {
     }
 
-    public final void setCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
-        setCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
-    }
-
     public final void setCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
-        setCooldown(player.getUniqueId(), time, unit);
+        this.setCooldown(player.getUniqueId(), time, unit);
     }
 
-    protected final void setCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
+
+    public final void setCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
+        this.setCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
+    }
+
+    public final void setCooldown(@NotNull Player player, @NotNull Duration duration) {
+        this.setCooldown(player.getUniqueId(), duration);
+    }
+
+    public final void setCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
         Instant expirationTime = Instant.now().plus(duration);
         cooldownMap.put(uuid, expirationTime);
-    }
-
-    protected final void setCooldown(@NotNull Player player, @NotNull Duration duration) {
-        setCooldown(player.getUniqueId(), duration);
     }
 
     public final boolean hasCooldown(@NotNull UUID uuid) {
@@ -55,6 +56,27 @@ public class CooldownManager {
 
     public final Duration getRemainingCooldown(@NotNull Player player) {
         return getRemainingCooldown(player.getUniqueId());
+    }
+
+    public boolean checkAndSetCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
+        return this.checkAndSetCooldown(player.getUniqueId(), Duration.ofMillis(unit.toMillis(time)));
+    }
+
+    public boolean checkAndSetCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
+        return this.checkAndSetCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
+    }
+
+    public boolean checkAndSetCooldown(@NotNull Player player, @NotNull Duration duration) {
+        return this.checkAndSetCooldown(player.getUniqueId(), duration);
+    }
+
+    public boolean checkAndSetCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
+        if(this.hasCooldown(uuid)) {
+            return true;
+        }
+
+        this.setCooldown(uuid, duration);
+        return false;
     }
 
 }
