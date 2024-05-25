@@ -84,9 +84,11 @@ public class StackBuilder {
         this.material = stack.getType();
         this.itemMeta = itemMeta;
 
+        this.displayName = itemMeta.getDisplayName();
+        this.amount = stack.getAmount();
+
         this.enchantments = new LinkedHashMap<>(stack.getEnchantments());
         this.flags = new HashSet<>(this.itemMeta.getItemFlags());
-        this.amount = stack.getAmount();
 
         List<String> lore = itemMeta.getLore();
         if(lore != null) {
@@ -209,6 +211,11 @@ public class StackBuilder {
     public StackBuilder setFlags(@NotNull Collection<ItemFlag> flags) {
         this.flags.clear();
         this.flags.addAll(flags);
+        return this;
+    }
+
+    public <T, Z> StackBuilder addPersistentData(@NotNull NamespacedKey key, @NotNull PersistentDataType<T, Z> type, @NotNull Z value) {
+        itemMeta.getPersistentDataContainer().set(key, type, value);
         return this;
     }
 
