@@ -313,7 +313,7 @@ public class StackBuilder {
         for (int i = 1; i < s.length; i++) {
             String[] split = s[i].split(":");
 
-            if(split.length == 1) {
+            if(split.length < 2) {
                 continue;
             }
 
@@ -321,17 +321,17 @@ public class StackBuilder {
             String value = split[1];
 
             switch (key) {
-                case "name","displayname" -> builder.setName(value.replace("_", " "));
+                case "name", "displayname" -> builder.setName(value.replace("_", " "));
                 case "lore" -> builder.addLore(Arrays.stream(value.split(",")).map(v -> v.replace("_", " ")).toList());
-                case "custommodeldata","cmd","model" -> builder.setCustomModelData(NumberUtils.parseInteger(value, 1));
+                case "custommodeldata", "cmd", "model" -> builder.setCustomModelData(NumberUtils.parseInteger(value, 1));
                 case "amount" -> builder.setAmount(NumberUtils.parseInteger(value, 1));
-                case "damage","dmg" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
-                case "unbreakable","unbr","unb" -> builder.setUnbreakable(Boolean.parseBoolean(value));
-                case "flag","flags" -> builder.setFlags(value.split(","));
-                case "head","head_texture" -> builder.setHeadTexture(value);
-                case "enchant","ench","enchantment" -> {
+                case "damage", "dmg" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
+                case "unbreakable", "unbr", "unb" -> builder.setUnbreakable(Boolean.parseBoolean(value));
+                case "flag", "flags" -> builder.setFlags(value.split(","));
+                case "head", "head_texture" -> builder.setHeadTexture(value);
+                case "enchant", "ench", "enchantment" -> {
                     String[] ench = value.split(";");
-                    if(ench.length == 1) {
+                    if (ench.length < 2) {
                         continue;
                     }
 
@@ -342,5 +342,6 @@ public class StackBuilder {
 
         return builder;
     }
+
 
 }
