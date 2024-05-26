@@ -52,14 +52,14 @@ public class JsonReader {
 
     @Nullable
     public String getString( @NotNull String path) {
-        return getString(path, null);
+        return this.getString(path, null);
     }
 
     @Nullable
     @Contract("_, !null -> !null")
     public String getString(@NotNull String path, @Nullable String def) {
         try {
-            JsonElement element = get(path);
+            JsonElement element = this.get(path);
             return element == null ? def : element.getAsString();
         } catch (Exception e) {
             return def;
@@ -217,6 +217,38 @@ public class JsonReader {
         return get(path, null);
     }
 
+    public <T> void getAndRun(@NotNull String path, @NotNull Class<T> clazz, @NotNull Consumer<T> function) {
+        JsonElement json = this.get(path);
+        if(json instanceof JsonObject obj && clazz.equals(JsonReader.class)) {
+            function.accept(clazz.cast(JsonReader.parseObject(obj)));
+        } else if(json instanceof JsonObject obj && clazz.equals(JsonObject.class)) {
+            function.accept(clazz.cast(JsonReader.parseObject(obj)));
+        }
+        else if (json instanceof JsonPrimitive primitive) {
+            Object value = null;
+
+            if (clazz.equals(String.class)) {
+                value = primitive.getAsString();
+            } else if ((clazz.equals(Integer.class) || clazz.equals(int.class)) && primitive.isNumber()) {
+                value = primitive.getAsInt();
+            } else if ((clazz.equals(Double.class) || clazz.equals(double.class)) && primitive.isNumber()) {
+                value = primitive.getAsDouble();
+            } else if ((clazz.equals(Boolean.class) || clazz.equals(boolean.class)) && primitive.isBoolean()) {
+                value = primitive.getAsBoolean();
+            } else if ((clazz.equals(Long.class) || clazz.equals(long.class)) && primitive.isNumber()) {
+                value = primitive.getAsLong();
+            } else if ((clazz.equals(Float.class) || clazz.equals(float.class)) && primitive.isNumber()) {
+                value = primitive.getAsFloat();
+            }
+
+            if(value != null && clazz.equals(value.getClass())) {
+                function.accept(clazz.cast(value));
+            }
+        } else if(json instanceof JsonArray array && clazz.equals(JsonArray.class)) {
+            function.accept(clazz.cast(array));
+        }
+    }
+
     @Nullable
     @Contract("_, !null -> !null")
     public JsonElement get(@NotNull String path, @Nullable JsonElement def) {
@@ -246,9 +278,16 @@ public class JsonReader {
         return def;
     }
 
+    public static void parseFile(@NotNull File file, @NotNull Consumer<JsonReader> function) {
+        JsonReader reader = JsonReader.parseFile(file);
+        if(reader != null) {
+            function.accept(reader);
+        }
+    }
+
     @Nullable
     public static JsonReader parseFile(@NotNull File file) {
-        return JsonReader.parseString(FileUtils.readFileToString(file));
+        return JsonReader.parseString(FileUtils.readFileToString(file, "{}"));
     }
 
     @Nullable
@@ -262,9 +301,9 @@ public class JsonReader {
     }
 
     public static void parseString(@NotNull String json, @NotNull Consumer<JsonReader> function) {
-        JsonReader easyJson = parseString(json);
-        if(easyJson != null) {
-            function.accept(easyJson);
+        JsonReader reader = JsonReader.parseString(json);
+        if(reader != null) {
+            function.accept(reader);
         }
     }
 
@@ -275,7 +314,7 @@ public class JsonReader {
 
     @NotNull
     public static <T> JsonArray getArrayString(@NotNull Stream<T> stream, Function<T, String> function) {
-        return getArrayString(stream.toList(), function);
+        return JsonReader.getArrayString(stream.toList(), function);
     }
 
     @NotNull
@@ -295,6 +334,33 @@ public class JsonReader {
         return list.stream()
                 .map(element -> element instanceof JsonObject object ? object : null)
                 .filter(Objects::nonNull).map(JsonReader::new).toList();
+    }
+
+
+    @NotNull
+    public static List<JsonReader> parseJsonArray(@NotNull File file) {
+        return JsonReader.parseJsonArray(FileUtils.readFileToString(file, "{}"));
+    }
+
+    @NotNull
+    public static List<JsonReader> parseJsonArray(@NotNull String json) {
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            if(!(jsonElement instanceof JsonArray array)) {
+                return Collections.emptyList();
+            }
+
+            List<JsonElement> list = new ArrayList<>();
+            array.forEach(list::add);
+
+            return list.stream()
+                    .filter(JsonElement::isJsonObject)
+                    .map(JsonElement::getAsJsonObject)
+                    .map(JsonReader::parseObject)
+                    .toList();
+
+        } catch (Exception ignore) { }
+        return Collections.emptyList();
     }
 
     @Override

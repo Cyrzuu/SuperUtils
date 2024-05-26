@@ -184,9 +184,13 @@ class BukkitCommand extends Command {
     private List<String> tabComplete(@NotNull CommandSender sender, @NotNull String... args) {
         CommandContext context = new CommandContext(args);
 
-        List<String> tabs =  sender instanceof Player player ?
+        List<String> tabs = sender instanceof Player player ?
             pluginCommand.tabComplete(player, context) :
             pluginCommand.tabComplete(sender, context);
+
+        if(sender instanceof Player && tabs.isEmpty()) {
+            tabs.addAll(pluginCommand.tabComplete(sender, context));
+        }
 
         String arg = context.get(context.size() - 1, "");
         return tabs.stream().filter(tab -> arg.isEmpty() || tab.toLowerCase().startsWith(arg.toLowerCase())).toList();
@@ -198,6 +202,10 @@ class BukkitCommand extends Command {
         List<String> tabs = sender instanceof Player player ?
             subCommand.tabComplete(player, context) :
             subCommand.tabComplete(sender, context);
+
+        if(sender instanceof Player && tabs.isEmpty()) {
+            tabs.addAll(pluginCommand.tabComplete(sender, context));
+        }
 
         String arg = context.get(context.size() - 1, "");
         return tabs.stream().filter(tab -> arg.isEmpty() || tab.toLowerCase().startsWith(arg.toLowerCase())).toList();

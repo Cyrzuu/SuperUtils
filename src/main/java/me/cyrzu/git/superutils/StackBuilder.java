@@ -292,7 +292,7 @@ public class StackBuilder {
     }
 
     public StackBuilder clone() {
-        return new StackBuilder(build());
+        return new StackBuilder(this.build());
     }
 
     @NotNull

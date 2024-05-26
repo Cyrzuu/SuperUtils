@@ -337,7 +337,7 @@ public class SuperConfig {
     @Nullable
     private Message parseMessage(@NotNull String id) {
         File messageJson = new File(plugin.getDataFolder(), "message.json");
-        String json = FileUtils.readFileToString(messageJson);
+        String json = FileUtils.readFileToString(messageJson, "{}");
         JsonReader reader = JsonReader.parseString(json);
 
         JsonReader messageReader = reader == null ? null : reader.getReader(id);
@@ -351,7 +351,7 @@ public class SuperConfig {
             SuperConfig.createDefaultItemFile(messageJson);
         }
 
-        String json = FileUtils.readFileToString(messageJson);
+        String json = FileUtils.readFileToString(messageJson, "{}");
         JsonReader reader = JsonReader.parseString(json);
 
         JsonReader itemReader = reader == null ? null : reader.getReader(id);
