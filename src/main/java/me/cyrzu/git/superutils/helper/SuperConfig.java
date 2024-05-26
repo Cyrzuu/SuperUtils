@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.FileUtils;
 import me.cyrzu.git.superutils.LocationUtils;
 import me.cyrzu.git.superutils.StackBuilder;
@@ -160,6 +161,17 @@ public class SuperConfig {
             .map(LocationUtils::deserialize)
             .filter(Objects::nonNull)
             .toList();
+    }
+
+    @Nullable
+    public <T extends Enum<T>> T getEnum(@NotNull String path, @NotNull Class<T> clazz) {
+        return this.getEnum(path, clazz, null);
+    }
+
+    @Nullable
+    @Contract("_, _, !null -> !null")
+    public <T extends Enum<T>> T getEnum(@NotNull String path, @NotNull Class<T> clazz, @Nullable T def) {
+        return EnumUtils.getEnum(this.getString(path, ""), clazz, def);
     }
 
     @NotNull
