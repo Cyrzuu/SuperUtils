@@ -304,6 +304,10 @@ public class StackBuilder {
     @Contract("_, !null -> !null")
     public static StackBuilder parseString(@NotNull String text, @Nullable StackBuilder def) {
         String[] s = text.split(" ");
+        if(s.length == 0) {
+            return def;
+        }
+
         Material material = EnumUtils.getEnum(s[0], Material.class);
         if(s.length == 1 || material == null || material.isAir()) {
             return material != null && !material.isAir() ? new StackBuilder(material) : def;
