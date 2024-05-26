@@ -61,6 +61,10 @@ public class JsonWriter {
         return json.deepCopy();
     }
 
+    public void saveToFile(@NotNull File file) {
+        this.saveToFile(file, false, false);
+    }
+
     public void saveToFile(@NotNull File file, boolean pretty) {
         this.saveToFile(file, pretty, false);
     }
@@ -87,6 +91,23 @@ public class JsonWriter {
         }
 
         return array;
+    }
+
+    public static void saveArrayToFile(@NotNull File file, @NotNull JsonArray array) {
+        JsonWriter.saveArrayToFile(file, array, false, false);
+    }
+
+    public static void saveArrayToFile(@NotNull File file, @NotNull JsonArray array, boolean pretty) {
+        JsonWriter.saveArrayToFile(file, array, pretty, false);
+    }
+
+    public static void saveArrayToFile(@NotNull File file, @NotNull JsonArray array, boolean pretty, boolean append) {
+        FileUtils.createFile(file);
+        try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8)) {
+            Gson gson = pretty ? new GsonBuilder().setPrettyPrinting().create() : new Gson();
+            gson.toJson(array, outputStreamWriter);
+        } catch (IOException ignore) {
+        }
     }
 
 }
