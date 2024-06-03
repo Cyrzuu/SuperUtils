@@ -227,6 +227,32 @@ public class SuperConfig {
         return location;
     }
 
+    @NotNull
+    public List<String> getKeys(@NotNull String path) {
+        return this.getKeys(path, false);
+    }
+
+    @NotNull
+    public List<String> getKeys(@NotNull String path, boolean deep) {
+        ConfigurationSection section = this.config.getConfigurationSection(path);
+        return section == null ? Collections.emptyList() :
+            List.copyOf(section.getKeys(deep));
+    }
+
+    @NotNull
+    public Map<String, @NotNull ConfigurationSection> getSections(@NotNull String path) {
+        Map<String, @NotNull ConfigurationSection> map = new LinkedHashMap<>();
+
+        for (String key : this.getKeys(path)) {
+            ConfigurationSection section = this.config.getConfigurationSection(key);
+            if(section != null) {
+                map.put(key, section);
+            }
+        }
+
+        return map;
+    }
+
     @Nullable
     public Object get(@NotNull String path) {
         return this.get(path, null);
