@@ -244,7 +244,7 @@ public class SuperConfig {
         Map<String, @NotNull ConfigurationSection> map = new LinkedHashMap<>();
 
         for (String key : this.getKeys(path)) {
-            ConfigurationSection section = this.config.getConfigurationSection(key);
+            ConfigurationSection section = this.config.getConfigurationSection(path + "." + key);
             if(section != null) {
                 map.put(key, section);
             }
