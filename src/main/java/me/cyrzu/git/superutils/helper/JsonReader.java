@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.*;
 import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.FileUtils;
+import me.cyrzu.git.superutils.LocationUtils;
+import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,6 +129,28 @@ public class JsonReader {
     @Contract("_, _, !null -> !null")
     public <T extends Enum<T>> T getEnum(@NotNull String path, @NotNull Class<T> clazz, @Nullable T def) {
         return EnumUtils.getEnum(getString(path, ""), clazz, def);
+    }
+
+    @Nullable
+    public Location getLocation(@NotNull String path) {
+        return LocationUtils.deserialize(this.getString(path), null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public Location getLocation(@NotNull String path, @Nullable Location def) {
+        return LocationUtils.deserialize(this.getString(path), def);
+    }
+
+    @Nullable
+    public Location getLocationBlock(@NotNull String path) {
+        return LocationUtils.deserializeBlock(this.getString(path), null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public Location getLocationBlock(@NotNull String path, @Nullable Location def) {
+        return LocationUtils.deserializeBlock(this.getString(path), def);
     }
 
     @NotNull
