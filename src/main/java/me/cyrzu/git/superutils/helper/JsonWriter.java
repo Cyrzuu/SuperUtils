@@ -2,6 +2,8 @@ package me.cyrzu.git.superutils.helper;
 
 import com.google.gson.*;
 import me.cyrzu.git.superutils.FileUtils;
+import me.cyrzu.git.superutils.LocationUtils;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -52,6 +54,8 @@ public class JsonWriter {
             temp.addProperty(key, value0);
         } else if(value instanceof Character value0) {
             temp.addProperty(key, value0);
+        } else if(value instanceof Location location) {
+            temp.addProperty(key, LocationUtils.serialize(location));
         } else {
             temp.addProperty(key, value.toString());
         }

@@ -14,31 +14,32 @@ import org.jetbrains.annotations.Nullable;
 @UtilityClass
 public class LocationUtils {
 
-    @Nullable
+    @NotNull
     public static String serialize(@NotNull Location location) {
-        return LocationUtils.serialize(location, 3, null);
+        return LocationUtils.serialize(location, 3, false);
     }
 
     @Nullable
-    @Contract("_, !null -> !null")
-    public static String serialize(@NotNull Location location, @Nullable String def) {
-        return LocationUtils.serialize(location, 3, def);
+    @Contract("_, true -> null; _, false -> !null")
+    public static String serialize(@NotNull Location location, boolean needWorld) {
+        return LocationUtils.serialize(location, 3, needWorld);
     }
 
-    @Nullable
+    @NotNull
     public static String serialize(@NotNull Location location, int round) {
-        return LocationUtils.serialize(location, round, null);
+        return LocationUtils.serialize(location, round, false);
     }
 
     @Nullable
-    @Contract("_, _, !null -> !null")
-    public static String serialize(@NotNull Location location, int round, @Nullable String def) {
-        if(location.getWorld() == null) {
-            return def;
+    @Contract("_, _, true -> null; _, _, false -> !null")
+    public static String serialize(@NotNull Location location, int round, boolean needWorld) {
+        World world = location.getWorld();
+        if(world == null && needWorld) {
+            return null;
         }
 
         JsonObject object = new JsonObject();
-        object.addProperty("world", location.getWorld().getName());
+        object.addProperty("world", world == null ? "world" : world.getName());
         object.addProperty("x", NumberUtils.round(location.getX(), round));
         object.addProperty("y", NumberUtils.round(location.getY(), round));
         object.addProperty("z", NumberUtils.round(location.getZ(), round));
