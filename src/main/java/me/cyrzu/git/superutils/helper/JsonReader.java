@@ -189,11 +189,11 @@ public class JsonReader {
     @Contract("_, !null -> !null")
     public Vector getVector(@NotNull String path, @Nullable Vector def) {
         JsonReader reader = this.getReader(path);
-        if(reader == null || (!this.isSet("x") || !this.isSet("y") || !this.isSet("z"))) {
+        if(reader == null || (!reader.isSet("x") || !reader.isSet("y") || !reader.isSet("z"))) {
             return def;
         }
 
-        return new Vector(this.getDouble("x"), this.getDouble("x"), this.getDouble("z"));
+        return new Vector(reader.getDouble("x"), reader.getDouble("x"), reader.getDouble("z"));
     }
 
     @NotNull
