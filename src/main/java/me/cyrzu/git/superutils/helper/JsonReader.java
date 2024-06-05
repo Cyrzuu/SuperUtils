@@ -6,6 +6,7 @@ import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.FileUtils;
 import me.cyrzu.git.superutils.LocationUtils;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +29,10 @@ public class JsonReader {
     @NotNull
     public JsonWriter toJsonWriter() {
         return new JsonWriter(this.jsonObject.deepCopy());
+    }
+
+    public boolean isSet(@NotNull String path) {
+        return this.get(path) != null;
     }
 
     @NotNull
@@ -94,7 +99,7 @@ public class JsonReader {
         }
     }
 
-    public double getDouble(@NotNull JsonObject object, @NotNull String path) {
+    public double getDouble(@NotNull String path) {
         return getDouble(path, 0);
     }
 
@@ -151,6 +156,26 @@ public class JsonReader {
     @Contract("_, !null -> !null")
     public Location getLocationBlock(@NotNull String path, @Nullable Location def) {
         return LocationUtils.deserializeBlock(this.getString(path), def);
+    }
+
+    @Nullable
+    public Vector getVector(@NotNull String path) {
+        return this.getVector(path, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public Vector getVector(@NotNull String path, @Nullable Vector def) {
+        JsonReader reader = JsonReader.parseString(this.getString(path, "{}"));
+        if(reader == null) {
+            return def;
+        }
+
+        if(!this.isSet("x") || !this.isSet("y") || !this.isSet("z")) {
+            return def;
+        }
+
+        return new Vector(this.getDouble("x"), this.getDouble("x"), this.getDouble("z"));
     }
 
     @NotNull
