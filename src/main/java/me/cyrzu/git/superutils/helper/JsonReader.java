@@ -5,7 +5,9 @@ import com.google.gson.*;
 import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.FileUtils;
 import me.cyrzu.git.superutils.LocationUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -138,24 +140,44 @@ public class JsonReader {
 
     @Nullable
     public Location getLocation(@NotNull String path) {
-        return LocationUtils.deserialize(this.getString(path), null);
+        return this.getLocation(path, null);
     }
 
     @Nullable
     @Contract("_, !null -> !null")
     public Location getLocation(@NotNull String path, @Nullable Location def) {
-        return LocationUtils.deserialize(this.getString(path), def);
+        JsonReader reader = this.getReader(path);
+        if(reader == null || (!reader.isSet("x") || !reader.isSet("y") || !reader.isSet("z"))) {
+            return def;
+        }
+
+        World world = Bukkit.getWorld(reader.getString("world", ""));
+        if(world == null) {
+            return def;
+        }
+
+        return new Location(world, reader.getDouble("x"), reader.getDouble("y"), reader.getDouble("z"), (float) reader.getDouble("yaw"), (float) reader.getDouble("pitch"));
     }
 
     @Nullable
     public Location getLocationBlock(@NotNull String path) {
-        return LocationUtils.deserializeBlock(this.getString(path), null);
+        return this.getLocationBlock(path, null);
     }
 
     @Nullable
     @Contract("_, !null -> !null")
     public Location getLocationBlock(@NotNull String path, @Nullable Location def) {
-        return LocationUtils.deserializeBlock(this.getString(path), def);
+        JsonReader reader = this.getReader(path);
+        if(reader == null || (!reader.isSet("x") || !reader.isSet("y") || !reader.isSet("z"))) {
+            return def;
+        }
+
+        World world = Bukkit.getWorld(reader.getString("world", ""));
+        if(world == null) {
+            return def;
+        }
+
+        return new Location(world, reader.getDouble("x"), reader.getDouble("y"), reader.getDouble("z"));
     }
 
     @Nullable
@@ -166,12 +188,8 @@ public class JsonReader {
     @Nullable
     @Contract("_, !null -> !null")
     public Vector getVector(@NotNull String path, @Nullable Vector def) {
-        JsonReader reader = JsonReader.parseString(this.getString(path, "{}"));
-        if(reader == null) {
-            return def;
-        }
-
-        if(!this.isSet("x") || !this.isSet("y") || !this.isSet("z")) {
+        JsonReader reader = this.getReader(path);
+        if(reader == null || (!this.isSet("x") || !this.isSet("y") || !this.isSet("z"))) {
             return def;
         }
 
