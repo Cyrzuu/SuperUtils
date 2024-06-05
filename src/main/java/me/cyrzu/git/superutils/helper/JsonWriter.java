@@ -26,8 +26,9 @@ public class JsonWriter {
         this.json = json;
     }
 
-    public <T> void set(@NotNull String path, @NotNull T value) {
+    public <T> JsonWriter set(@NotNull String path, @NotNull T value) {
         this.setPath(path, value);
+        return this;
     }
 
     private <T> void setPath(@NotNull String path, @NotNull T value) {
@@ -56,14 +57,12 @@ public class JsonWriter {
         } else if(value instanceof Character value0) {
             temp.addProperty(key, value0);
         } else if(value instanceof Location location) {
-            temp.addProperty(key, LocationUtils.serialize(location));
+            temp.add(key, LocationUtils.serializeJsonObject(location, 3, false));
         } else if(value instanceof Vector vector) {
-            JsonWriter writer = new JsonWriter();
-            writer.set("x", vector.getX());
-            writer.set("y", vector.getY());
-            writer.set("z", vector.getZ());
-
-            temp.add(key, writer.getCopy());
+            temp.add(key, new JsonWriter()
+                    .set("x", vector.getX())
+                    .set("y", vector.getY())
+                    .set("z", vector.getZ()).getCopy());
         }
         else {
             temp.addProperty(key, value.toString());
@@ -72,6 +71,11 @@ public class JsonWriter {
 
     public JsonObject getCopy() {
         return json.deepCopy();
+    }
+
+    @Override
+    public String toString() {
+        return json.deepCopy().toString();
     }
 
     public void saveToFile(@NotNull File file) {

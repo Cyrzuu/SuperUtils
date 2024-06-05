@@ -3,6 +3,7 @@ package me.cyrzu.git.superutils;
 import com.google.gson.JsonObject;
 import lombok.experimental.UtilityClass;
 import me.cyrzu.git.superutils.helper.JsonReader;
+import me.cyrzu.git.superutils.helper.JsonWriter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -47,6 +48,24 @@ public class LocationUtils {
         object.addProperty("pitch", NumberUtils.round(location.getPitch(), 2));
 
         return object.toString();
+    }
+
+    @Nullable
+    @Contract("_, _, true -> null; _, _, false -> !null")
+    public static JsonObject serializeJsonObject(@NotNull Location location, int round, boolean needWorld) {
+        World world = location.getWorld();
+        if(world == null && needWorld) {
+            return null;
+        }
+
+        return new JsonWriter()
+                .set("world", world == null ? "world" : world.getName())
+                .set("x", location.getX())
+                .set("y", location.getY())
+                .set("z", location.getZ())
+                .set("yaw", location.getYaw())
+                .set("pitch", location.getPitch())
+                .getCopy();
     }
 
     @Nullable
