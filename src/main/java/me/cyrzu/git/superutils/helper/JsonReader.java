@@ -193,7 +193,7 @@ public class JsonReader {
             return def;
         }
 
-        return new Vector(reader.getDouble("x"), reader.getDouble("x"), reader.getDouble("z"));
+        return new Vector(reader.getDouble("x"), reader.getDouble("y"), reader.getDouble("z"));
     }
 
     @NotNull
