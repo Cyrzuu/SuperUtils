@@ -4,6 +4,7 @@ import com.google.gson.*;
 import me.cyrzu.git.superutils.FileUtils;
 import me.cyrzu.git.superutils.LocationUtils;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -26,7 +27,7 @@ public class JsonWriter {
     }
 
     public <T> void set(@NotNull String path, @NotNull T value) {
-        setPath(path, value);
+        this.setPath(path, value);
     }
 
     private <T> void setPath(@NotNull String path, @NotNull T value) {
@@ -56,7 +57,15 @@ public class JsonWriter {
             temp.addProperty(key, value0);
         } else if(value instanceof Location location) {
             temp.addProperty(key, LocationUtils.serialize(location));
-        } else {
+        } else if(value instanceof Vector vector) {
+            JsonWriter writer = new JsonWriter();
+            writer.set("x", vector.getX());
+            writer.set("y", vector.getY());
+            writer.set("z", vector.getZ());
+
+            temp.add(key, writer.getCopy());
+        }
+        else {
             temp.addProperty(key, value.toString());
         }
     }
