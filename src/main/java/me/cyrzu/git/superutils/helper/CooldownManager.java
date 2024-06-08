@@ -79,4 +79,26 @@ public class CooldownManager {
         return false;
     }
 
+    public void addOrSetCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
+        this.addOrSetCooldown(player.getUniqueId(), Duration.ofMillis(unit.toMillis(time)));
+    }
+
+    public void addOrSetCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
+        this.addOrSetCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
+    }
+
+    public void addOrSetCooldown(@NotNull Player player, @NotNull Duration duration) {
+        this.addOrSetCooldown(player.getUniqueId(), duration);
+    }
+
+    public void addOrSetCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
+        if(this.hasCooldown(uuid)) {
+            Instant expirationTime = Instant.now().plus(this.getRemainingCooldown(uuid).plus(duration));
+            this.cooldownMap.put(uuid, expirationTime);
+            return;
+        }
+
+        this.setCooldown(uuid, duration);
+    }
+
 }
