@@ -1,52 +1,37 @@
 package me.cyrzu.git.superutils.helper;
 
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class CooldownManager {
+public class CooldownManager<T> {
 
     @NotNull
-    private final Map<UUID, Instant> cooldownMap = new ConcurrentHashMap<>();
+    private final Map<T, Instant> cooldownMap = new ConcurrentHashMap<>();
 
     public CooldownManager() {
     }
 
-    public final void setCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
-        this.setCooldown(player.getUniqueId(), time, unit);
+    public final void setCooldown(@NotNull T value, int time, @NotNull TimeUnit unit) {
+        this.setCooldown(value, Duration.ofMillis(unit.toMillis(time)));
     }
 
-
-    public final void setCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
-        this.setCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
-    }
-
-    public final void setCooldown(@NotNull Player player, @NotNull Duration duration) {
-        this.setCooldown(player.getUniqueId(), duration);
-    }
-
-    public final void setCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
+    public final void setCooldown(@NotNull T value, @NotNull Duration duration) {
         Instant expirationTime = Instant.now().plus(duration);
-        cooldownMap.put(uuid, expirationTime);
+        cooldownMap.put(value, expirationTime);
     }
 
-    public final boolean hasCooldown(@NotNull UUID uuid) {
-        Instant expirationTime = cooldownMap.get(uuid);
+    public final boolean hasCooldown(@NotNull T value) {
+        Instant expirationTime = cooldownMap.get(value);
         return expirationTime != null && Instant.now().isBefore(expirationTime);
     }
 
-    public final boolean hasCooldown(@NotNull Player player) {
-        return hasCooldown(player.getUniqueId());
-    }
-
-    public final Duration getRemainingCooldown(@NotNull UUID uuid) {
-        Instant expirationTime = cooldownMap.get(uuid);
+    public final Duration getRemainingCooldown(@NotNull T value) {
+        Instant expirationTime = cooldownMap.get(value);
         if (expirationTime != null) {
             return Duration.between(Instant.now(), expirationTime);
         }
@@ -54,51 +39,31 @@ public class CooldownManager {
         return Duration.ZERO;
     }
 
-    public final Duration getRemainingCooldown(@NotNull Player player) {
-        return getRemainingCooldown(player.getUniqueId());
+    public boolean checkAndSetCooldown(@NotNull T value, int time, @NotNull TimeUnit unit) {
+        return this.checkAndSetCooldown(value, Duration.ofMillis(unit.toMillis(time)));
     }
 
-    public boolean checkAndSetCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
-        return this.checkAndSetCooldown(player.getUniqueId(), Duration.ofMillis(unit.toMillis(time)));
-    }
-
-    public boolean checkAndSetCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
-        return this.checkAndSetCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
-    }
-
-    public boolean checkAndSetCooldown(@NotNull Player player, @NotNull Duration duration) {
-        return this.checkAndSetCooldown(player.getUniqueId(), duration);
-    }
-
-    public boolean checkAndSetCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
-        if(this.hasCooldown(uuid)) {
+    public boolean checkAndSetCooldown(@NotNull T value, @NotNull Duration duration) {
+        if(this.hasCooldown(value)) {
             return true;
         }
 
-        this.setCooldown(uuid, duration);
+        this.setCooldown(value, duration);
         return false;
     }
 
-    public void addOrSetCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
-        this.addOrSetCooldown(player.getUniqueId(), Duration.ofMillis(unit.toMillis(time)));
+    public void addCooldown(@NotNull T value, int time, @NotNull TimeUnit unit) {
+        this.addCooldown(value, Duration.ofMillis(unit.toMillis(time)));
     }
-
-    public void addOrSetCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
-        this.addOrSetCooldown(uuid, Duration.ofMillis(unit.toMillis(time)));
-    }
-
-    public void addOrSetCooldown(@NotNull Player player, @NotNull Duration duration) {
-        this.addOrSetCooldown(player.getUniqueId(), duration);
-    }
-
-    public void addOrSetCooldown(@NotNull UUID uuid, @NotNull Duration duration) {
-        if(this.hasCooldown(uuid)) {
-            Instant expirationTime = Instant.now().plus(this.getRemainingCooldown(uuid).plus(duration));
-            this.cooldownMap.put(uuid, expirationTime);
+    
+    public void addCooldown(@NotNull T value, @NotNull Duration duration) {
+        if(this.hasCooldown(value)) {
+            Instant expirationTime = Instant.now().plus(this.getRemainingCooldown(value).plus(duration));
+            this.cooldownMap.put(value, expirationTime);
             return;
         }
 
-        this.setCooldown(uuid, duration);
+        this.setCooldown(value, duration);
     }
 
 }
