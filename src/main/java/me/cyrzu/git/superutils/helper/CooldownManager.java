@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class CooldownManager<T> {
 
@@ -75,6 +76,13 @@ public class CooldownManager<T> {
     @NotNull
     public Set<T> keySet() {
         return this.cooldownMap.keySet();
+    }
+
+    @NotNull
+    public Set<T> activeKeySet() {
+        return this.cooldownMap.keySet().stream()
+                .filter(this::hasCooldown)
+                .collect(Collectors.toSet());
     }
 
 }
