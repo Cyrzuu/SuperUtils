@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -64,6 +65,16 @@ public class CooldownManager<T> {
         }
 
         this.setCooldown(value, duration);
+    }
+
+    @NotNull
+    public Map<T, Instant> getMap() {
+        return Map.copyOf(this.cooldownMap);
+    }
+
+    @NotNull
+    public Set<T> keySet() {
+        return this.cooldownMap.keySet();
     }
 
 }
