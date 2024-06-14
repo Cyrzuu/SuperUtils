@@ -70,6 +70,10 @@ public class CooldownManager<T> {
         this.setCooldown(value, duration);
     }
 
+    public boolean contains(@NotNull T value) {
+        return this.cooldownMap.containsKey(value);
+    }
+
     public void removeCooldown(@NotNull T value) {
         this.cooldownMap.remove(value);
     }
