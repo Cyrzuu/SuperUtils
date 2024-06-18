@@ -2,6 +2,7 @@ package me.cyrzu.git.superutils;
 
 import lombok.Getter;
 import me.cyrzu.git.superutils.color.ColorUtils;
+import me.cyrzu.git.superutils.helper.ReplaceBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class StackBuilder {
+public class StackBuilder implements Cloneable {
 
     @NotNull
     private static final ItemMeta DEFAULT_META;
@@ -191,9 +192,15 @@ public class StackBuilder {
         return this;
     }
 
+    public StackBuilder allFlags() {
+        this.flags.clear();
+        this.flags.addAll(Arrays.asList(ItemFlag.values()));
+        return this;
+    }
+
     public StackBuilder setFlags(@NotNull String... flags) {
         if(Arrays.stream(flags).anyMatch(f -> f.equalsIgnoreCase("all"))) {
-            setFlags(Arrays.asList(ItemFlag.values()));
+            this.setFlags(Arrays.asList(ItemFlag.values()));
             return this;
         }
 
@@ -202,7 +209,7 @@ public class StackBuilder {
                     .map(v -> ItemFlag.valueOf(v.toUpperCase()))
                     .toList();
 
-            setFlags(list);
+            this.setFlags(list);
         } catch (Exception ignored) { }
 
         return this;
@@ -268,6 +275,46 @@ public class StackBuilder {
     }
 
     @NotNull
+    public ItemStack build(@NotNull ReplaceBuilder replace, @NotNull Object... objects) {
+        if(material.isAir()) {
+            return new ItemStack(Material.AIR);
+        }
+
+        itemMeta.setDisplayName(displayName == null ?
+                null :
+                ColorUtils.parseText(replace.replaceMessage(displayName, objects)));
+
+        List<String> lore = this.lore.stream()
+                .map(line -> replace.replaceMessage(line, objects))
+                .map(ColorUtils::parseText).toList();
+        itemMeta.setLore(lore);
+
+        itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
+
+        if(itemMeta instanceof Damageable damageable) {
+            if(damage >= 0) {
+                damageable.setDamage(damage);
+            }
+
+            damageable.setUnbreakable(unbreakable);
+        }
+
+        itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
+
+        ItemStack stack = new ItemStack(material);
+        stack.setAmount(Math.min(amount, 64));
+        stack.setItemMeta(itemMeta);
+        stack.addUnsafeEnchantments(enchantments);
+
+        if(headTexture != null && itemMeta instanceof SkullMeta skullMeta) {
+            skullMeta.setOwnerProfile(headTexture);
+            stack.setItemMeta(skullMeta);
+        }
+
+        return stack;
+    }
+
+    @NotNull
     public String getDisplayName() {
         return this.displayName != null ? this.displayName : material.name().replace("_", " ").toLowerCase();
     }
@@ -292,7 +339,11 @@ public class StackBuilder {
     }
 
     public StackBuilder clone() {
-        return new StackBuilder(this.build());
+        try {
+            return (StackBuilder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error(e);
+        }
     }
 
     @NotNull
@@ -325,15 +376,15 @@ public class StackBuilder {
             String value = split[1];
 
             switch (key) {
-                case "name", "displayname" -> builder.setName(value.replace("_", " "));
-                case "lore" -> builder.addLore(Arrays.stream(value.split(",")).map(v -> v.replace("_", " ")).toList());
-                case "custommodeldata", "cmd", "model" -> builder.setCustomModelData(NumberUtils.parseInteger(value, 1));
-                case "amount" -> builder.setAmount(NumberUtils.parseInteger(value, 1));
-                case "damage", "dmg" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
-                case "unbreakable", "unbr", "unb" -> builder.setUnbreakable(Boolean.parseBoolean(value));
-                case "flag", "flags" -> builder.setFlags(value.split(","));
-                case "head", "head_texture" -> builder.setHeadTexture(value);
-                case "enchant", "ench", "enchantment" -> {
+                case "name", "displayname","n" -> builder.setName(value.replace("_", " "));
+                case "lore","l" -> builder.addLore(Arrays.stream(value.split(",")).map(v -> v.replace("_", " ")).toList());
+                case "custommodeldata", "cmd", "model","c" -> builder.setCustomModelData(NumberUtils.parseInteger(value, 1));
+                case "amount","a" -> builder.setAmount(NumberUtils.parseInteger(value, 1));
+                case "damage", "dmg","d" -> builder.setDamage(NumberUtils.parseInteger(value, 1));
+                case "unbreakable", "unbr", "unb","u" -> builder.setUnbreakable(Boolean.parseBoolean(value));
+                case "flag", "flags","f" -> builder.setFlags(value.split(","));
+                case "head", "head_texture","skull","h" -> builder.setHeadTexture(value);
+                case "enchant", "ench", "enchantment","e" -> {
                     String[] ench = value.split(";");
                     if (ench.length < 2) {
                         continue;
@@ -346,6 +397,5 @@ public class StackBuilder {
 
         return builder;
     }
-
 
 }

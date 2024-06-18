@@ -10,6 +10,7 @@ import me.cyrzu.git.superutils.LocationUtils;
 import me.cyrzu.git.superutils.StackBuilder;
 import me.cyrzu.git.superutils.color.ColorUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -212,6 +213,22 @@ public class SuperConfig {
     }
 
     @Nullable
+    public ItemStack getItemStack(@NotNull String path, @NotNull ReplaceBuilder replace, @NotNull Object... values) {
+        return this.getItemStack(path, null, replace, values);
+    }
+
+    @Nullable
+    @Contract("_, !null, _, _ -> !null; _, null, _, _ -> _")
+    public ItemStack getItemStack(@NotNull String path, @Nullable ItemStack def, @NotNull ReplaceBuilder replace, @NotNull Object... values) {
+        Object val = this.get(path + ".itembuilder", def);
+        if(!(val instanceof StackBuilder item)) {
+            return def;
+        }
+
+        return item.build(replace, values);
+    }
+
+    @Nullable
     public Location getLocation(@NotNull String path) {
         return this.getLocation(path, null);
     }
@@ -346,6 +363,7 @@ public class SuperConfig {
         StackBuilder builder = StackBuilder.parseString(string, null);
         if(builder != null) {
             SuperConfig.createDefaultItemFile(new File(plugin.getDataFolder(), "item.json"));
+            this.data.put(key + ".itembuilder", builder);
             this.data.put(key + ".item", builder.build());
         }
 
