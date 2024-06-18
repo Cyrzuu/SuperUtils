@@ -14,6 +14,9 @@ public class ItemConfig {
     @NotNull
     private final ItemStack item;
 
+    @NotNull
+    private final StackBuilder builder;
+
     public ItemConfig(@NotNull JsonReader reader) {
         String headTexture = reader.getString("head_texture");
         StackBuilder builder = headTexture != null ? new StackBuilder(ItemUtils.getCustomHead(headTexture)) :
@@ -33,6 +36,7 @@ public class ItemConfig {
             }
         }
 
+        this.builder = builder;
         this.item = builder.build();
     }
 
