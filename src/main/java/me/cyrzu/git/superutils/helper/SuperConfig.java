@@ -371,6 +371,7 @@ public class SuperConfig {
         if(itemPattern.matches()) {
             ItemConfig item = this.parseItem(string.split(":")[1]);
             if(item != null) {
+                this.data.put(key + ".itembuilder", item.getBuilder());
                 this.data.put(key + ".item", item.getItem());
             }
         }
