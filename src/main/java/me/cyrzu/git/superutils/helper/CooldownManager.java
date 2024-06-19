@@ -3,8 +3,6 @@ package me.cyrzu.git.superutils.helper;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 public class CooldownManager<T> {
 
     @NotNull
-    private final Map<T, Instant> cooldownMap = new ConcurrentHashMap<>();
+    private final Map<T, Long> cooldownMap = new ConcurrentHashMap<>();
 
     public CooldownManager() {
     }
@@ -25,21 +23,20 @@ public class CooldownManager<T> {
     }
 
     public final void setCooldown(@NotNull T value, @NotNull Duration duration) {
-        Instant expirationTime = Instant.now().plus(duration);
+        long expirationTime = System.nanoTime() + duration.toNanos();
         cooldownMap.put(value, expirationTime);
     }
 
     public final boolean hasCooldown(@NotNull T value) {
-        Instant expirationTime = cooldownMap.get(value);
-        return expirationTime != null && Instant.now().isBefore(expirationTime);
+        Long expirationTime = cooldownMap.get(value);
+        return expirationTime != null && System.nanoTime() < expirationTime;
     }
 
     public final Duration getRemainingCooldown(@NotNull T value) {
-        Instant expirationTime = cooldownMap.get(value);
+        Long expirationTime = cooldownMap.get(value);
         if (expirationTime != null) {
-            return Duration.between(Instant.now(), expirationTime);
+            return Duration.ofNanos(expirationTime - System.nanoTime());
         }
-
         return Duration.ZERO;
     }
 
@@ -51,7 +48,6 @@ public class CooldownManager<T> {
         if(this.hasCooldown(value)) {
             return true;
         }
-
         this.setCooldown(value, duration);
         return false;
     }
@@ -59,14 +55,13 @@ public class CooldownManager<T> {
     public void addCooldown(@NotNull T value, int time, @NotNull TimeUnit unit) {
         this.addCooldown(value, Duration.ofMillis(unit.toMillis(time)));
     }
-    
+
     public void addCooldown(@NotNull T value, @NotNull Duration duration) {
         if(this.hasCooldown(value)) {
-            Instant expirationTime = Instant.now().plus(this.getRemainingCooldown(value).plus(duration));
+            long expirationTime = System.nanoTime() + this.getRemainingCooldown(value).toNanos() + duration.toNanos();
             this.cooldownMap.put(value, expirationTime);
             return;
         }
-
         this.setCooldown(value, duration);
     }
 
@@ -84,13 +79,12 @@ public class CooldownManager<T> {
             if(!filter.test(key)) {
                 return;
             }
-
             this.cooldownMap.remove(key);
         });
     }
 
     @NotNull
-    public Map<T, Instant> getMap() {
+    public Map<T, Long> getMap() {
         return Map.copyOf(this.cooldownMap);
     }
 
