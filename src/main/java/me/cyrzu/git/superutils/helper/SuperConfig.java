@@ -10,7 +10,6 @@ import me.cyrzu.git.superutils.LocationUtils;
 import me.cyrzu.git.superutils.StackBuilder;
 import me.cyrzu.git.superutils.color.ColorUtils;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -386,6 +385,10 @@ public class SuperConfig {
         JsonReader reader = JsonReader.parseString(json);
 
         JsonReader messageReader = reader == null ? null : reader.getReader(id);
+        if((id.equalsIgnoreCase("empty") || id.equalsIgnoreCase("null")) && messageReader == null) {
+            return Message.EMPTY_MESSAGE;
+        }
+
         return messageReader != null ? new Message(messageReader) : null;
     }
 
