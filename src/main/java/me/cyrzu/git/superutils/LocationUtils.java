@@ -60,11 +60,11 @@ public class LocationUtils {
 
         return new JsonWriter()
                 .set("world", world == null ? "world" : world.getName())
-                .set("x", location.getX())
-                .set("y", location.getY())
-                .set("z", location.getZ())
-                .set("yaw", location.getYaw())
-                .set("pitch", location.getPitch())
+                .set("x", NumberUtils.round(location.getX(), round))
+                .set("y", NumberUtils.round(location.getY(), round))
+                .set("z", NumberUtils.round(location.getZ(), round))
+                .set("yaw", NumberUtils.round(location.getYaw(), 2))
+                .set("pitch", NumberUtils.round(location.getPitch(), 2))
                 .getCopy();
     }
 

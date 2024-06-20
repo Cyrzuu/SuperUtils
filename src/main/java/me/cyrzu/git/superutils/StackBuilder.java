@@ -193,7 +193,6 @@ public class StackBuilder implements Cloneable {
     }
 
     public StackBuilder allFlags() {
-        this.flags.clear();
         this.flags.addAll(Arrays.asList(ItemFlag.values()));
         return this;
     }
@@ -216,8 +215,12 @@ public class StackBuilder implements Cloneable {
     }
 
     public StackBuilder setFlags(@NotNull Collection<ItemFlag> flags) {
-        this.flags.clear();
         this.flags.addAll(flags);
+        return this;
+    }
+
+    public StackBuilder setFlags(@NotNull ItemFlag... flags) {
+        this.flags.addAll(Arrays.asList(flags));
         return this;
     }
 

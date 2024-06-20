@@ -5,8 +5,12 @@ import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.ItemUtils;
 import me.cyrzu.git.superutils.StackBuilder;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class ItemConfig {
@@ -27,7 +31,11 @@ public class ItemConfig {
         builder.setCustomModelData(reader.getInt("custommodeldata", -1));
         builder.setAmount(reader.getInt("amount", 1));
         builder.setUnbreakable(reader.getBoolean("unbreakable", false));
-        builder.setFlags(reader.getListString("flags").toArray(String[]::new));
+
+        List<ItemFlag> flags = reader.getListString("flags").stream()
+                .map(value -> EnumUtils.getEnum(value, ItemFlag.class))
+                .filter(Objects::nonNull).toList();
+        builder.setFlags(flags);
 
         JsonReader enchants = reader.getReader("enchants");
         if(enchants != null) {
