@@ -113,8 +113,29 @@ public class NumberUtils {
         }
     }
 
-    public static int randomInteger(int min, int max) {
+    public int randomInteger(int min, int max) {
         return min >= max ? min : random.nextInt(max + 1 - min) + min;
+    }
+
+    public boolean chance(double chance) {
+        if(chance >= 100D) {
+            return true;
+        }
+
+        if(chance <= 0D) {
+            return false;
+        }
+
+        double randomValue = random.nextDouble() * 100;
+        return randomValue < chance;
+    }
+
+    public double getPercents(double percent, double number) {
+        return (percent / 100.0) * number;
+    }
+
+    public double getPercents(double percent, double number, int round) {
+        return NumberUtils.round((percent / 100.0) * number, round);
     }
 
 }
