@@ -34,20 +34,8 @@ public class LocationUtils {
     @Nullable
     @Contract("_, _, true -> null; _, _, false -> !null")
     public static String serialize(@NotNull Location location, int round, boolean needWorld) {
-        World world = location.getWorld();
-        if(world == null && needWorld) {
-            return null;
-        }
-
-        JsonObject object = new JsonObject();
-        object.addProperty("world", world == null ? "world" : world.getName());
-        object.addProperty("x", NumberUtils.round(location.getX(), round));
-        object.addProperty("y", NumberUtils.round(location.getY(), round));
-        object.addProperty("z", NumberUtils.round(location.getZ(), round));
-        object.addProperty("yaw", NumberUtils.round(location.getYaw(), 2));
-        object.addProperty("pitch", NumberUtils.round(location.getPitch(), 2));
-
-        return object.toString();
+        JsonObject object = LocationUtils.serializeJsonObject(location, round, needWorld);
+        return object != null ? object.toString() : null;
     }
 
     @Nullable
@@ -60,6 +48,22 @@ public class LocationUtils {
 
         return new JsonWriter()
                 .set("world", world == null ? "world" : world.getName())
+                .set("x", NumberUtils.round(location.getX(), round))
+                .set("y", NumberUtils.round(location.getY(), round))
+                .set("z", NumberUtils.round(location.getZ(), round))
+                .set("yaw", NumberUtils.round(location.getYaw(), 2))
+                .set("pitch", NumberUtils.round(location.getPitch(), 2))
+                .getCopy();
+    }
+
+    @NotNull
+    public static String serializeNoWorld(@NotNull Location location, int round) {
+        return LocationUtils.serializeNoWorldJsonObject(location, round).toString();
+    }
+
+    @NotNull
+    public static JsonObject serializeNoWorldJsonObject(@NotNull Location location, int round) {
+        return new JsonWriter()
                 .set("x", NumberUtils.round(location.getX(), round))
                 .set("y", NumberUtils.round(location.getY(), round))
                 .set("z", NumberUtils.round(location.getZ(), round))
@@ -88,6 +92,20 @@ public class LocationUtils {
         object.addProperty("z", location.getBlockZ());
 
         return object.toString();
+    }
+
+    @NotNull
+    public static String serializeBlockNoWorld(@NotNull Location location, int round) {
+        return LocationUtils.serializeBlockNoWorldJsonObject(location, round).toString();
+    }
+
+    @NotNull
+    public static JsonObject serializeBlockNoWorldJsonObject(@NotNull Location location, int round) {
+        return new JsonWriter()
+                .set("x", location.getBlockX())
+                .set("y", location.getBlockY())
+                .set("z", location.getBlockZ())
+                .getCopy();
     }
 
     @Nullable
@@ -119,6 +137,29 @@ public class LocationUtils {
     }
 
     @Nullable
+    public static Location deserializeNoWorld(@Nullable String text) {
+        return LocationUtils.deserializeNoWorld(text, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static Location deserializeNoWorld(@Nullable String text, @Nullable Location def) {
+        JsonReader reader = JsonReader.parseString(text == null ? "" : text);
+        if(reader == null) {
+            return def;
+        }
+
+        return new Location(
+                null,
+                reader.getDouble("x"),
+                reader.getDouble("y"),
+                reader.getDouble("z"),
+                (float) reader.getDouble("yaw"),
+                (float) reader.getDouble("pitch")
+        );
+    }
+
+    @Nullable
     public static Location deserializeBlock(@Nullable String text) {
         return LocationUtils.deserializeBlock(text, null);
     }
@@ -141,6 +182,27 @@ public class LocationUtils {
                 reader.getInt("x", 0),
                 reader.getInt("y", 0),
                 reader.getInt("z", 0)
+        );
+    }
+
+    @Nullable
+    public static Location deserializeBlockNoWorld(@Nullable String text) {
+        return LocationUtils.deserializeBlockNoWorld(text, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static Location deserializeBlockNoWorld(@Nullable String text, @Nullable Location def) {
+        JsonReader reader = JsonReader.parseString(text == null ? "" : text);
+        if(reader == null) {
+            return def;
+        }
+
+        return new Location(
+                null,
+                reader.getInt("x"),
+                reader.getInt("y"),
+                reader.getInt("z")
         );
     }
 
