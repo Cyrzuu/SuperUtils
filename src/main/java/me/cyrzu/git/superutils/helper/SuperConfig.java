@@ -324,11 +324,15 @@ public class SuperConfig {
                 ConfigurationSection configSection = config.getConfigurationSection(key);
                 configSection = configSection == null ? config.createSection(key) : configSection;
 
+                if(this.disabledPaths.contains(newPath)) {
+                    continue;
+                }
+
                 this.saveResource(configSection, resourceSection, newPath);
                 continue;
             }
 
-            if(!config.isSet(key) && !this.disabledPaths.contains(newPath)) {
+            if(!config.isSet(key)) {
                 config.set(key, object);
             }
         }
