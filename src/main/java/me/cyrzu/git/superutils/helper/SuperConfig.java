@@ -305,15 +305,16 @@ public class SuperConfig {
         }
 
         if(append) {
-            this.saveResource(this.config, this.resourceConfig);
+            this.saveResource(this.config, this.resourceConfig, "");
         }
 
         this.config.save(this.file);
         this.loadConfiguration(this.config, "");
     }
 
-    private void saveResource(@NotNull ConfigurationSection config, @NotNull ConfigurationSection resourceConfig) {
+    private void saveResource(@NotNull ConfigurationSection config, @NotNull ConfigurationSection resourceConfig, @NotNull String path) {
         for (String key : resourceConfig.getKeys(false)) {
+            String newPath = path.isEmpty() ? key : path + "." + key;
             Object object = resourceConfig.get(key);
             if(object == null) {
                 continue;
@@ -323,11 +324,11 @@ public class SuperConfig {
                 ConfigurationSection configSection = config.getConfigurationSection(key);
                 configSection = configSection == null ? config.createSection(key) : configSection;
 
-                this.saveResource(configSection, resourceSection);
+                this.saveResource(configSection, resourceSection, newPath);
                 continue;
             }
 
-            if(!config.isSet(key)) {
+            if(!config.isSet(key) && !this.disabledPaths.contains(newPath)) {
                 config.set(key, object);
             }
         }
@@ -337,7 +338,7 @@ public class SuperConfig {
         for (String key : config.getKeys(false)) {
             String newPath = path.isEmpty() ? key : path + "." + key;
             Object object = config.get(key);
-            if(object == null || this.disabledPaths.contains(newPath)) {
+            if(object == null) {
                 continue;
             }
 
