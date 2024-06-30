@@ -53,13 +53,25 @@ public class SuperConfig {
     @NotNull
     private final Map<String, Object> data;
 
+    @NotNull
+    private final Set<String> disabledPaths;
+
     public final boolean append;
 
     public SuperConfig(@NotNull Plugin plugin, @NotNull String resource) {
-        this(plugin, resource, true);
+        this(plugin, resource, new String[0]);
+    }
+
+    public SuperConfig(@NotNull Plugin plugin, @NotNull String resource, @NotNull String... disabledPaths) {
+        this(plugin, resource, true, disabledPaths);
     }
 
     public SuperConfig(@NotNull Plugin plugin, @NotNull String resource, boolean append) {
+        this(plugin, resource, append, new String[0]);
+    }
+
+    public SuperConfig(@NotNull Plugin plugin, @NotNull String resource, boolean append, @NotNull String... disabledPaths) {
+        this.disabledPaths = new HashSet<>(Arrays.asList(disabledPaths));
         this.append = append;
         this.resource = resource.endsWith(".yml") ? resource : resource + ".yml";
         this.file = new File(plugin.getDataFolder(), this.resource);
@@ -325,7 +337,7 @@ public class SuperConfig {
         for (String key : config.getKeys(false)) {
             String newPath = path.isEmpty() ? key : path + "." + key;
             Object object = config.get(key);
-            if(object == null) {
+            if(object == null || this.disabledPaths.contains(newPath)) {
                 continue;
             }
 
