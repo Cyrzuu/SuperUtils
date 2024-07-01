@@ -29,10 +29,10 @@ import java.util.regex.Pattern;
 public class SuperConfig {
 
     @NotNull
-    public final static Pattern MESSAGE_PATTERN = Pattern.compile("messages?:\\s*\\w+");
+    public final static Pattern MESSAGE_PATTERN = Pattern.compile("messages?:.*");
 
     @NotNull
-    public final static Pattern ITEM_PATTERN = Pattern.compile("item:\\w+");
+    public final static Pattern ITEM_PATTERN = Pattern.compile("item:*");
 
 
     @NotNull
@@ -199,7 +199,7 @@ public class SuperConfig {
     @Nullable
     @Contract("_, !null -> !null")
     public Message getMessage(@NotNull String path, @Nullable Message def) {
-        Object val = this.get(path, def);
+        Object val = this.get(path + ".message", def);
         if(val instanceof String string) {
             return Message.of(string);
         }
@@ -369,10 +369,9 @@ public class SuperConfig {
         SuperConfig.createDefaultMessageFile(new File(plugin.getDataFolder(), "message.json"));
         Matcher messagePattern = SuperConfig.MESSAGE_PATTERN.matcher(string);
         if(messagePattern.matches()) {
-            Message message = this.parseMessage(string.split(":")[1]);
+            Message message = this.parseMessage(string.split(":", 2)[1]);
             if(message != null) {
-                this.data.put(key, message);
-                return;
+                this.data.put(key + ".message", message);
             }
         }
 
