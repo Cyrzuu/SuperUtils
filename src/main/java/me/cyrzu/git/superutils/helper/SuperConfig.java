@@ -32,7 +32,7 @@ public class SuperConfig {
     public final static Pattern MESSAGE_PATTERN = Pattern.compile("messages?:.*");
 
     @NotNull
-    public final static Pattern ITEM_PATTERN = Pattern.compile("item:*");
+    public final static Pattern ITEM_PATTERN = Pattern.compile("item:.*");
 
 
     @NotNull
@@ -383,6 +383,8 @@ public class SuperConfig {
         }
 
         Matcher itemPattern = SuperConfig.ITEM_PATTERN.matcher(string);
+        System.out.println(itemPattern);
+        System.out.println(string);
         if(itemPattern.matches()) {
             ItemConfig item = this.parseItem(string.split(":")[1]);
             if(item != null) {
