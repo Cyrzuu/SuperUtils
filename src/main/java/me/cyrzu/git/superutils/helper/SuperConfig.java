@@ -366,6 +366,9 @@ public class SuperConfig {
             this.data.put(key + ".location", location);
         }
 
+        String parseText = ColorUtils.parseText(string);
+        this.data.put(key + ".message", new Message(parseText));
+
         SuperConfig.createDefaultMessageFile(new File(plugin.getDataFolder(), "message.json"));
         Matcher messagePattern = SuperConfig.MESSAGE_PATTERN.matcher(string);
         if(messagePattern.matches()) {
@@ -391,7 +394,7 @@ public class SuperConfig {
             }
         }
 
-        this.data.put(key, ColorUtils.parseText(string));
+        this.data.put(key, parseText);
     }
 
     @Nullable

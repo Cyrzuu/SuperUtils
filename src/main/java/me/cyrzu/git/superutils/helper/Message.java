@@ -25,6 +25,10 @@ public class Message {
     @Nullable
     private final PlaySound sound;
 
+    public Message(@NotNull String message) {
+        this(new String[]{message}, null, null, null);
+    }
+
     private Message() {
         this.messages = new String[0];
         this.actionbar = null;
