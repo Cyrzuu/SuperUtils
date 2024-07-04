@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -204,6 +205,20 @@ public class LocationUtils {
                 reader.getInt("y"),
                 reader.getInt("z")
         );
+    }
+
+    public double distance(@Nullable Location location, @Nullable Location secondLocation) {
+        return Math.sqrt(LocationUtils.distanceSquared(location, secondLocation));
+    }
+
+    public double distanceSquared(@Nullable Location location, @Nullable Location secondLocation) {
+        if(location == null || secondLocation == null) {
+            return Double.MAX_VALUE;
+        }
+
+        return NumberConversions.square(location.getX() - secondLocation.getX()) +
+                NumberConversions.square(location.getY() - secondLocation.getY()) +
+                NumberConversions.square(location.getZ() - secondLocation.getZ());
     }
 
 }
