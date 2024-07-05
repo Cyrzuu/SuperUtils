@@ -406,7 +406,7 @@ public class JsonReader {
 
     @NotNull
     public static List<JsonReader> parseJsonArray(@NotNull File file) {
-        return JsonReader.parseJsonArray(FileUtils.readFileToString(file, "{}"));
+        return JsonReader.parseJsonArray(FileUtils.readFileToString(file, "[]"));
     }
 
     @NotNull
@@ -428,6 +428,28 @@ public class JsonReader {
 
         } catch (Exception ignore) { }
         return Collections.emptyList();
+    }
+
+    @NotNull
+    public static List<String> parseJsonArrayString(@NotNull String json) {
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            if(!(jsonElement instanceof JsonArray array)) {
+                return Collections.emptyList();
+            }
+
+            List<JsonElement> list = new ArrayList<>();
+            array.forEach(list::add);
+
+            return list.stream()
+                    .filter(JsonElement::isJsonPrimitive)
+                    .map(JsonElement::getAsJsonPrimitive)
+                    .map(JsonPrimitive::getAsString)
+                    .toList();
+
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     @Override

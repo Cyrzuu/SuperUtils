@@ -20,13 +20,13 @@ public class StringUtils {
     private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 
     @Nullable
-    public static String compressToBase64(@NotNull String text) {
+    public String compressToBase64(@NotNull String text) {
         return StringUtils.compressToBase64(text, null);
     }
 
     @Nullable
     @Contract("_, !null -> !null")
-    public static String compressToBase64(@NotNull String text, @Nullable String def) {
+    public String compressToBase64(@NotNull String text, @Nullable String def) {
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
              GZIPOutputStream gzipStream = new GZIPOutputStream(byteStream)) {
             gzipStream.write(text.getBytes(CHARSET_UTF8));
@@ -37,13 +37,13 @@ public class StringUtils {
     }
 
     @Nullable
-    public static String decodeFromBase64(@NotNull String text) {
+    public String decodeFromBase64(@NotNull String text) {
         return StringUtils.decodeFromBase64(text, null);
     }
 
     @Nullable
     @Contract("_, !null -> !null")
-    public static String decodeFromBase64(@NotNull String text, @Nullable String def) {
+    public String decodeFromBase64(@NotNull String text, @Nullable String def) {
         byte[] decodedBytes = Base64.getDecoder().decode(text);
         try (ByteArrayInputStream byteInputStream = new ByteArrayInputStream(decodedBytes);
              GZIPInputStream gzipInputStream = new GZIPInputStream(byteInputStream);

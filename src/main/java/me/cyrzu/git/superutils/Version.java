@@ -23,6 +23,8 @@ public enum Version {
     v1_21_R1("1.21"),
     UNKNOWN("Unknown");
 
+    public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackage().getName();
+
     @Getter
     @NotNull
     private final String version;

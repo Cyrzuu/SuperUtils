@@ -1,6 +1,10 @@
 package me.cyrzu.git.superutils;
 
+import com.google.gson.JsonArray;
 import lombok.experimental.UtilityClass;
+import me.cyrzu.git.superutils.helper.ItemNbt;
+import me.cyrzu.git.superutils.helper.JsonReader;
+import me.cyrzu.git.superutils.helper.JsonWriter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -9,15 +13,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -26,76 +30,49 @@ public class ItemUtils {
     private static final UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private static final String url = "http://textures.minecraft.net/texture/";
 
-    private static final Class<?> NBT_TAG_COMPOUND = ReflectionUtils.getClass("net.minecraft.nbt", "NBTTagCompound");
-    private static final Class<?> CRAFT_ITEM_STACK = ReflectionUtils.getClass("org.bukkit.craftbukkit." + Version.getCurrent() + ".inventory", "CraftItemStack");
-    private static final Class<?> NMS_ITEM_STACK = ReflectionUtils.getClass("net.minecraft.world.item", "ItemStack");
-    private static final Class<?> NBT_IO = ReflectionUtils.getClass("net.minecraft.nbt", "NBTCompressedStreamTools");
-
-    private static final Constructor<?> COMPOUND_CONSTRUCTOR = ReflectionUtils.getConstructor(NBT_TAG_COMPOUND);
-
-    private static final Method AS_NMS_COPY = ReflectionUtils.getMethod(CRAFT_ITEM_STACK, "asNMSCopy", ItemStack.class);
-    private static final Method SAVE = ReflectionUtils.getMethod(NMS_ITEM_STACK, "b", NBT_TAG_COMPOUND);
-    private static final Method WRITE = ReflectionUtils.getMethod(NBT_IO, "a", NBT_TAG_COMPOUND, DataOutput.class);
-
-    private static final Method READ = ReflectionUtils.getMethod(NBT_IO, "a", DataInput.class);
-    private static final Method OF = ReflectionUtils.getMethod(NMS_ITEM_STACK, "a", NBT_TAG_COMPOUND);
-    private static final Method AS_BUKKIT_COPY = ReflectionUtils.getMethod(CRAFT_ITEM_STACK, "asBukkitCopy", NMS_ITEM_STACK);
+    public static String serialize(@NotNull ItemStack stack) {
+        return ItemUtils.serialize(stack, null);
+    }
 
     @Nullable
-    public static String serialize(@NotNull ItemStack stack) {
-        if(AS_NMS_COPY == null || SAVE == null || WRITE == null) {
-            throw new NullPointerException();
+    @Contract("_, !null -> !null")
+    public static String serialize(@Nullable ItemStack item, @Nullable String def) {
+        if(item == null) {
+            return def;
         }
 
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream dataOutput = new DataOutputStream(outputStream);
-
-            Object compoundTag = ReflectionUtils.invokeConstructor(COMPOUND_CONSTRUCTOR);
-            Object nmsStack = AS_NMS_COPY.invoke(null, stack);
-            SAVE.invoke(nmsStack, compoundTag);
-            WRITE.invoke(null, compoundTag, dataOutput);
-
-            return new BigInteger(1, outputStream.toByteArray()).toString(16);
-        } catch (Exception ignored) {
-            return null;
-        }
+        String compress = ItemNbt.compress(item);
+        return compress != null ? compress : def;
     }
 
     @NotNull
     public static String serializeArray(@NotNull ItemStack[] stacks) {
-        StringBuilder builder = new StringBuilder();
-        Arrays.stream(stacks)
-                .map(ItemUtils::serialize)
-                .filter(Objects::nonNull)
-                .forEach(s -> builder.append(s).append(","));
-
-        int length = builder.length();
-        return length <= 0 ? "" : builder.substring(0, length);
+        JsonArray list = JsonWriter.createArray(Arrays.asList(stacks), (array, stack) ->
+                array.add(ItemUtils.serialize(stack, "")));
+        return list.toString();
     }
 
     @Nullable
-    public static ItemStack deserialize(@NotNull String var0) {
-        if(READ == null || OF == null || AS_BUKKIT_COPY == null) {
-            throw new NullPointerException();
-        }
-
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(var0, 16).toByteArray());
-
-            Object tag = READ.invoke(null, new DataInputStream(inputStream));
-            Object nmsStack = OF.invoke(null, tag);
-            return (ItemStack) AS_BUKKIT_COPY.invoke(null, nmsStack);
-        } catch (Exception ignored) {
-            return null;
-        }
+    public static ItemStack deserialize(@Nullable String var0) {
+        return ItemUtils.deserialize(var0, null);
     }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static ItemStack deserialize(@Nullable String var0, @Nullable ItemStack def) {
+        if(var0 == null) {
+            return def;
+        }
+
+        ItemStack decompress = ItemNbt.decompress(var0);
+        return decompress != null ? decompress : def;
+    }
+
 
     @NotNull
     public static ItemStack[] deserializeArray(@NotNull String var0) {
-        return Arrays.stream(var0.split(","))
-                .map(ItemUtils::deserialize)
-                .filter(Objects::nonNull)
+        return JsonReader.parseJsonArrayString(var0).stream()
+                .map(item -> ItemUtils.deserialize(item, new ItemStack(Material.AIR)))
                 .toArray(ItemStack[]::new);
     }
 

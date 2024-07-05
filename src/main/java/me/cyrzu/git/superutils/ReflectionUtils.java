@@ -16,6 +16,10 @@ public class ReflectionUtils {
         return getClass(path + "." + name);
     }
 
+    public static Class<?> getInnerClass(@NotNull String path, @NotNull String name) {
+        return getClass(path + "$" + name);
+    }
+
     @NotNull
     private static Class<?> getClass(@NotNull String path) {
         try {
