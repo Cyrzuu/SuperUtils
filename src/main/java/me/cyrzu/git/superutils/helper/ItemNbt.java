@@ -120,7 +120,11 @@ public class ItemNbt {
     }
 
     @Nullable
-    public static ItemStack decompress(@NotNull String compressed) {
+    public static ItemStack decompress(@Nullable String compressed) {
+        if (compressed == null || compressed.isEmpty()) {
+            return null;
+        }
+
         if (NBT_IO_READ == null || CRAFT_ITEM_STACK_AS_BUKKIT_COPY == null) {
             throw new UnsupportedOperationException("Unsupported server version!");
         }
