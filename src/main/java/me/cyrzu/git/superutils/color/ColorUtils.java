@@ -9,10 +9,16 @@ import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @UtilityClass
 public class ColorUtils {
+
+    @NotNull
+    private final Gradient GRADIENT = new Gradient();
 
     @NotNull
     public static ChatColor ERROR_COLOR = ChatColor.of(new Color(204, 0, 0));
@@ -22,7 +28,7 @@ public class ColorUtils {
 
     @NotNull
     private final static List<ColorPattern> patterns = List.of(
-            new Gradient(),
+            GRADIENT,
             new Minecraft(),
             new Hexadecimal()
     );
@@ -34,6 +40,14 @@ public class ColorUtils {
         }
 
         return text;
+    }
+
+    public String parseGradient(@NotNull String text, @NotNull Color... gradients) {
+        return GRADIENT.applyColor(text, Arrays.asList(gradients));
+    }
+
+    public String parseGradient(@NotNull String text, @NotNull Collection<Color> gradients) {
+        return GRADIENT.applyColor(text, List.copyOf(gradients));
     }
 
     @NotNull

@@ -30,6 +30,7 @@ public class ItemUtils {
     private static final UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private static final String url = "http://textures.minecraft.net/texture/";
 
+    @Nullable
     public static String serialize(@NotNull ItemStack stack) {
         return ItemUtils.serialize(stack, null);
     }

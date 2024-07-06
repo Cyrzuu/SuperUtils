@@ -28,7 +28,6 @@ public class Gradient implements ColorPattern {
         this.reset = new TextComponent(ChatColor.RESET.toString());
     }
 
-
     @Override
     public @NotNull String parseText(@NotNull String text) {
         Matcher matcher = pattern.matcher(text);
@@ -45,7 +44,7 @@ public class Gradient implements ColorPattern {
         return result.toString();
     }
 
-    private String applyColor(String text, List<Color> colors) {
+    public String applyColor(String text, List<Color> colors) {
         GradientBuilder gradient = new GradientBuilder(colors, text.length());
         TextComponent textComponent = new TextComponent();
         List<String> split = match.matcher(text).results().map(MatchResult::group).toList();
