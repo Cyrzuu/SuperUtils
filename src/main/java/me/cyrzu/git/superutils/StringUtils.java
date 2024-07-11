@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -59,5 +60,19 @@ public class StringUtils {
             return def;
         }
     }
+
+    @Nullable
+    public UUID toUUID(@Nullable String text) {
+        if(text == null) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 }

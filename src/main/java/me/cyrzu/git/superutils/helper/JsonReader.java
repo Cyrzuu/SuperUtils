@@ -5,6 +5,7 @@ import com.google.gson.*;
 import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.FileUtils;
 import me.cyrzu.git.superutils.LocationUtils;
+import me.cyrzu.git.superutils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -268,6 +269,18 @@ public class JsonReader {
     }
 
     @Nullable
+    public UUID getUUID(@NotNull String path) {
+        return this.getUUID(path, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public UUID getUUID(@NotNull String path, @Nullable UUID def) {
+        UUID uuid = StringUtils.toUUID(this.getString(path, ""));
+        return uuid != null ? uuid : def;
+    }
+
+    @Nullable
     public JsonReader getReader(@NotNull String path) {
         return this.getReader(path, null);
     }
@@ -403,7 +416,6 @@ public class JsonReader {
                 .filter(Objects::nonNull).map(JsonReader::new).toList();
     }
 
-
     @NotNull
     public static List<JsonReader> parseJsonArray(@NotNull File file) {
         return JsonReader.parseJsonArray(FileUtils.readFileToString(file, "[]"));
@@ -445,6 +457,27 @@ public class JsonReader {
                     .filter(JsonElement::isJsonPrimitive)
                     .map(JsonElement::getAsJsonPrimitive)
                     .map(JsonPrimitive::getAsString)
+                    .toList();
+
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    @NotNull
+    public static List<JsonPrimitive> parseJsonArrayPrimative(@NotNull String json) {
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            if(!(jsonElement instanceof JsonArray array)) {
+                return Collections.emptyList();
+            }
+
+            List<JsonElement> list = new ArrayList<>();
+            array.forEach(list::add);
+
+            return list.stream()
+                    .filter(JsonElement::isJsonPrimitive)
+                    .map(JsonElement::getAsJsonPrimitive)
                     .toList();
 
         } catch (Exception e) {
