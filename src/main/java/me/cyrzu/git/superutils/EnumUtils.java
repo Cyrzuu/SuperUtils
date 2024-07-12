@@ -1,6 +1,7 @@
 package me.cyrzu.git.superutils;
 
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,12 @@ public class EnumUtils {
         } catch (final Exception exception) {
             return def;
         }
+    }
+
+    @NotNull
+    public String capitalize(@NotNull Enum<?> value) {
+        String name = value.name();
+        return StringUtils.capitalizeFully(name.replace("_", " "));
     }
 
 }
