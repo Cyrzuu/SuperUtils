@@ -70,7 +70,7 @@ public class StringUtils {
         if(text == null) {
             return null;
         }
-        String capitalize = WordUtils.capitalize("");
+
         try {
             return UUID.fromString(text);
         } catch (Exception e) {
