@@ -77,15 +77,11 @@ public class StringUtils {
         }
     }
 
-    public static String capitalize(@NotNull String str) {
-        return StringUtils.capitalize(str, new char[0]);
-    }
-
-    public static String capitalize(@NotNull String str, char... delimiters) {
+    public static String capitalize(@NotNull String str, final char... delimiters) {
         if (str.isEmpty()) {
             return str;
         }
-        final Predicate<Integer> isDelimiter = StringUtils.generateIsDelimiterFunction(delimiters);
+        final Predicate<Integer> isDelimiter = generateIsDelimiterFunction(delimiters);
         final int strLen = str.length();
         final int[] newCodePoints = new int[strLen];
         int outOffset = 0;
@@ -111,20 +107,22 @@ public class StringUtils {
         return new String(newCodePoints, 0, outOffset);
     }
 
-    public static String capitalizeFully(@NotNull String str) {
-        return StringUtils.capitalizeFully(str, new char[0]);
+    public static String capitalizeFully(final String str) {
+        return capitalizeFully(str, null);
     }
 
-    public static String capitalizeFully(@NotNull String str, char... delimiters) {
+
+    public static String capitalizeFully(String str, final char... delimiters) {
         if (str.isEmpty()) {
             return str;
         }
         str = str.toLowerCase();
-        return StringUtils.capitalize(str, delimiters);
+        return capitalize(str, delimiters);
     }
 
-    @NotNull
-    private Predicate<Integer> generateIsDelimiterFunction(char[] delimiters) {
+
+
+    private static Predicate<Integer> generateIsDelimiterFunction(final char[] delimiters) {
         final Predicate<Integer> isDelimiter;
         if (delimiters == null || delimiters.length == 0) {
             isDelimiter = delimiters == null ? Character::isWhitespace : c -> false;
