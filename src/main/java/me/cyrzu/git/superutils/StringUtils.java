@@ -1,6 +1,7 @@
 package me.cyrzu.git.superutils;
 
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,5 +75,25 @@ public class StringUtils {
         }
     }
 
+    public static String capitalizeFully(@NotNull String str) {
+        return StringUtils.capitalize(str.toLowerCase());
+    }
+
+    public String capitalize(@NotNull String str) {
+        if (str.isEmpty()) {
+            return str;
+        }
+
+        final char[] buffer = str.toCharArray();
+        boolean capitalizeNext = true;
+        for (int i = 0; i < buffer.length; i++) {
+            final char ch = buffer[i];
+            if (capitalizeNext) {
+                buffer[i] = Character.toTitleCase(ch);
+                capitalizeNext = false;
+            }
+        }
+        return new String(buffer);
+    }
 
 }
