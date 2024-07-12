@@ -1,7 +1,6 @@
 package me.cyrzu.git.superutils;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
