@@ -299,6 +299,7 @@ public class StackBuilder implements Cloneable {
                 ColorUtils.parseText(replace.replaceMessage(displayName, objects)));
 
         List<String> lore = new ArrayList<>(this.lore.stream()
+                .filter(line -> line.isBlank() || !replace.replaceMessage(line, objects).isEmpty())
                 .map(line -> replace.replaceMessage(line, objects))
                 .toList());
 
@@ -309,7 +310,7 @@ public class StackBuilder implements Cloneable {
 
             int i = lore.indexOf(s);
             String[] split = s.split("\n");
-            if(i == -1 || split.length < 2) {
+            if(i == -1) {
                 continue;
             }
 
