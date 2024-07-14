@@ -300,6 +300,21 @@ public class StackBuilder implements Cloneable {
                 .map(line -> replace.replaceMessage(line, objects))
                 .toList());
 
+        for (String s : List.copyOf(lore)) {
+            if(!s.contains("\n")) {
+                continue;
+            }
+
+            int i = lore.indexOf(s);
+            String[] split = s.split("\n");
+            if(i == -1 || split.length < 2) {
+                continue;
+            }
+
+            lore.remove(i);
+            lore.addAll(i, Arrays.asList(split));
+        }
+
         itemMeta.setLore(lore);
 
         itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
