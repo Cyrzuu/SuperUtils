@@ -112,11 +112,21 @@ public class StackBuilder implements Cloneable {
     }
 
     public StackBuilder addLore(@NotNull String... lore) {
-        return addLore(Arrays.asList(lore));
+        return this.addLore(Arrays.asList(lore));
     }
 
     public StackBuilder addLore(@NotNull List<String> lore) {
-        this.lore.addAll(lore);
+        List<String> tempList = new ArrayList<>();
+        for (String s : lore) {
+            if(!s.contains("\n")) {
+                tempList.add(ColorUtils.parseText(s));
+                continue;
+            }
+
+            tempList.addAll(Arrays.stream(s.split("\n")).map(ColorUtils::parseText).toList());
+        }
+
+        this.lore.addAll(tempList);
         return this;
     }
 
@@ -127,13 +137,13 @@ public class StackBuilder implements Cloneable {
 
     public StackBuilder setLore(@NotNull List<String> lore) {
         this.lore.clear();
-        this.lore.addAll(lore);
+        this.addLore(lore);
         return this;
     }
 
     public StackBuilder setLore(@NotNull String... lore) {
         this.lore.clear();
-        this.lore.addAll(Arrays.asList(lore));
+        this.addLore(lore);
         return this;
     }
 
@@ -249,9 +259,8 @@ public class StackBuilder implements Cloneable {
                 null :
                 ColorUtils.parseText(displayName));
 
-        List<String> lore = this.lore.stream().map(ColorUtils::parseText).toList();
-        itemMeta.setLore(lore);
-
+//        List<String> lore = this.lore.stream().map(ColorUtils::parseText).toList();
+        itemMeta.setLore(this.lore);
         itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
 
         if(itemMeta instanceof Damageable damageable) {
@@ -279,7 +288,7 @@ public class StackBuilder implements Cloneable {
 
     @NotNull
     public ItemStack build(@NotNull ReplaceBuilder replace, @NotNull Object... objects) {
-        if(material.isAir()) {
+        if(material == Material.AIR || !material.isItem()) {
             return new ItemStack(Material.AIR);
         }
 
@@ -287,9 +296,10 @@ public class StackBuilder implements Cloneable {
                 null :
                 ColorUtils.parseText(replace.replaceMessage(displayName, objects)));
 
-        List<String> lore = this.lore.stream()
+        List<String> lore = new ArrayList<>(this.lore.stream()
                 .map(line -> replace.replaceMessage(line, objects))
-                .map(ColorUtils::parseText).toList();
+                .toList());
+
         itemMeta.setLore(lore);
 
         itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
