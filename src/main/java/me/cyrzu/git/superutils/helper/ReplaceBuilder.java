@@ -24,7 +24,7 @@ public class ReplaceBuilder {
     }
 
     public String replaceMessage(@NotNull String message, @NotNull Object... args) {
-        if(this.replacment.size() <= args.length) {
+        if(this.replacment.size() > args.length) {
             return message;
         }
 
