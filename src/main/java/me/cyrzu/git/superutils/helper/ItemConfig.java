@@ -31,6 +31,8 @@ public class ItemConfig {
         builder.setCustomModelData(reader.getInt("custommodeldata", -1));
         builder.setAmount(reader.getInt("amount", 1));
         builder.setUnbreakable(reader.getBoolean("unbreakable", false));
+        builder.setDamage(reader.getInt("damage"));
+        builder.setDyeColor(reader.getInt("dyecolor"));
 
         List<ItemFlag> flags = reader.getListString("flags").stream()
                 .map(value -> EnumUtils.getEnum(value, ItemFlag.class))

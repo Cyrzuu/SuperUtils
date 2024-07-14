@@ -3,15 +3,17 @@ package me.cyrzu.git.superutils;
 import lombok.Getter;
 import me.cyrzu.git.superutils.color.ColorUtils;
 import me.cyrzu.git.superutils.helper.ReplaceBuilder;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ColorableArmorMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.profile.PlayerProfile;
@@ -19,7 +21,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class StackBuilder implements Cloneable {
 
@@ -61,6 +65,9 @@ public class StackBuilder implements Cloneable {
 
     @Getter
     private int damage = -1;
+
+    @Getter
+    private int dyeColor = -1;
 
     private final Map<Enchantment, Integer> enchantments;
 
@@ -167,8 +174,21 @@ public class StackBuilder implements Cloneable {
         return this;
     }
 
+    public StackBuilder setDyeColor(@Nullable java.awt.Color color) {
+        return this.setDyeColor(color != null ? color.getRGB() : null);
+    }
+
+    public StackBuilder setDyeColor(@Nullable Color color) {
+        return this.setDyeColor(color != null ? color.asRGB() : null);
+    }
+
+    public StackBuilder setDyeColor(@Nullable Integer rgb) {
+        this.dyeColor = rgb != null ? rgb : -1;
+        return this;
+    }
+
     public StackBuilder addEnchantment(@NotNull String enchantment, int level) {
-        Enchantment byName = Enchantment.getByKey(NamespacedKey.minecraft(enchantment.toLowerCase()));
+        Enchantment byName = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(enchantment.toLowerCase()));
         if(byName != null) {
             addEnchantment(byName, level);
         }
@@ -259,7 +279,6 @@ public class StackBuilder implements Cloneable {
                 null :
                 ColorUtils.parseText(displayName));
 
-//        List<String> lore = this.lore.stream().map(ColorUtils::parseText).toList();
         itemMeta.setLore(this.lore);
         itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
 
@@ -269,6 +288,10 @@ public class StackBuilder implements Cloneable {
             }
 
             damageable.setUnbreakable(unbreakable);
+        }
+
+        if(itemMeta instanceof ColorableArmorMeta colorable && this.dyeColor != -1) {
+            colorable.setColor(Color.fromRGB(this.dyeColor));
         }
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
