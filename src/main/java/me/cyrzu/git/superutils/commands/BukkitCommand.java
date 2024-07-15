@@ -1,7 +1,9 @@
 package me.cyrzu.git.superutils.commands;
 
+import me.cyrzu.git.superutils.DurationUtils;
 import me.cyrzu.git.superutils.color.ColorUtils;
 import me.cyrzu.git.superutils.commands.annotations.*;
+import me.cyrzu.git.superutils.helper.CooldownManager;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
@@ -12,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +30,9 @@ class BukkitCommand extends Command {
 
     @NotNull
     private final Map<String, SubCommand> subCommands = new HashMap<>();
+
+    @NotNull
+    private final CooldownManager<UUID> cooldownManager = new CooldownManager<>();
 
     @NotNull
     private final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
@@ -88,29 +94,27 @@ class BukkitCommand extends Command {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         if (!owningPlugin.isEnabled()) {
-            throw new CommandException("Cannot execute command '" + commandLabel + "' in plugin " + owningPlugin.getDescription().getFullName() + " - plugin is disabled.");
+            throw new CommandException("Cannot execute command '%s' in plugin %s - plugin is disabled.".formatted(commandLabel, owningPlugin.getDescription().getFullName()));
         }
 
-        if (!testPermission(sender)) {
+        if (!this.testPermission(sender) || (!(sender instanceof Player) && !(sender instanceof ConsoleCommandSender))) {
             return true;
         }
 
         if(cooldown > 0 && sender instanceof Player player && !player.isOp()) {
-            long current = System.currentTimeMillis();
             UUID uuid = player.getUniqueId();
-            long cooldownExTime = cooldownMap.getOrDefault(uuid, 0L);
-
-            if(current < cooldownExTime) {
+            if(cooldownManager.checkAndSetCooldown(uuid, this.cooldown, TimeUnit.SECONDS)) {
                 if(cooldownMessage.isEmpty()) {
                     return false;
                 }
 
-                long remaing = TimeUnit.MILLISECONDS.toSeconds(cooldownExTime - current);
-                player.sendMessage(cooldownMessage.replace("%sec", String.valueOf(remaing)));
+                Duration remaing = cooldownManager.getRemainingCooldown(uuid);
+                player.sendMessage(cooldownMessage
+                        .replace("%sec", String.valueOf(remaing.toSeconds()))
+                        .replace("%time", DurationUtils.formatToString(remaing)));
+
                 return false;
             }
-
-            cooldownMap.put(uuid, current + cooldown);
         }
 
         if(subCommands.isEmpty() || args.length == 0) {

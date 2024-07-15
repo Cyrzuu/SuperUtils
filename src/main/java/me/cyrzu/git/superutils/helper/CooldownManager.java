@@ -40,7 +40,11 @@ public class CooldownManager<T> {
         return Duration.ZERO;
     }
 
-    public boolean checkAndSetCooldown(@NotNull T value, int time, @NotNull TimeUnit unit) {
+    public boolean checkAndSetCooldown(@NotNull T value, Number time, @NotNull TimeUnit unit) {
+        return this.checkAndSetCooldown(value, Duration.ofMillis(unit.toMillis(time.longValue())));
+    }
+
+    public boolean checkAndSetCooldown(@NotNull T value, long time, @NotNull TimeUnit unit) {
         return this.checkAndSetCooldown(value, Duration.ofMillis(unit.toMillis(time)));
     }
 
@@ -48,6 +52,7 @@ public class CooldownManager<T> {
         if(this.hasCooldown(value)) {
             return true;
         }
+
         this.setCooldown(value, duration);
         return false;
     }
