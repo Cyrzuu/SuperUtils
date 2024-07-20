@@ -63,6 +63,11 @@ public class JsonWriter {
                     .set("x", vector.getX())
                     .set("y", vector.getY())
                     .set("z", vector.getZ()).getCopy());
+        } else if(value instanceof Bound bound) {
+            temp.add(key, new JsonWriter()
+                    .set("min", bound.getMinVector())
+                    .set("max", bound.getMaxVector())
+                    .getCopy());
         }
         else {
             temp.addProperty(key, value.toString());

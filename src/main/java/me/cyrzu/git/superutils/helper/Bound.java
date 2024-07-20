@@ -1,4 +1,4 @@
-package me.cyrzu.git.superutils;
+package me.cyrzu.git.superutils.helper;
 
 import lombok.Getter;
 import org.bukkit.Location;
@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class Bound {
+
+    @NotNull
+    public final static Bound ZERO_BOUND = new Bound(0, 0, 0, 0, 0, 0);
 
     private final int minX;
     private final int minY;
@@ -59,6 +62,18 @@ public class Bound {
         return (x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ);
     }
 
+    public int sizeX() {
+        return (this.maxX - this.minX) + 1;
+    }
+
+    public int sizeZ() {
+        return (this.maxZ - this.minZ) + 1;
+    }
+
+    public int sizeY() {
+        return (this.maxY - this.minY) + 1;
+    }
+
     @Override
     public String toString() {
         return "Bound{" +
@@ -69,6 +84,10 @@ public class Bound {
                 ", maxY=" + maxY +
                 ", maxZ=" + maxZ +
                 '}';
+    }
+
+    public static Bound of(@NotNull Location min, @NotNull Location max) {
+        return new Bound(min, max);
     }
 
     public static Bound of(@NotNull Vector min, @NotNull Vector max) {

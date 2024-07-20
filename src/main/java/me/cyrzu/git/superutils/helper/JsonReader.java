@@ -197,6 +197,31 @@ public class JsonReader {
         return new Vector(reader.getDouble("x"), reader.getDouble("y"), reader.getDouble("z"));
     }
 
+    @Nullable
+    public Bound getBound(@NotNull String path) {
+        return this.getBound(path, null);
+    }
+
+    @Nullable
+    @Contract("_, !null -> !null")
+    public Bound getBound(@NotNull String path, @Nullable Bound def) {
+        JsonReader reader = this.getReader(path);
+        if(reader == null) {
+            return def;
+        }
+
+        JsonReader min = reader.getReader("min");
+        JsonReader max = reader.getReader("max");
+        if(min == null || max == null) {
+            return def;
+        }
+
+        return new Bound(
+                min.getInt("x"), min.getInt("y"), min.getInt("z"),
+                max.getInt("x"), max.getInt("y"), max.getInt("z")
+        );
+    }
+
     @NotNull
     public JsonArray getJsonArray(@NotNull String path) {
         return getJsonArray(path, new JsonArray());
@@ -294,7 +319,7 @@ public class JsonReader {
 
     @Nullable
     public JsonElement get(@NotNull String path) {
-        return get(path, null);
+        return this.get(path, null);
     }
 
     public <T> void getAndRun(@NotNull String path, @NotNull Class<T> clazz, @NotNull Consumer<T> function) {
