@@ -94,7 +94,7 @@ public class JsonWriter {
     public void saveToFile(@NotNull File file, boolean pretty, boolean append) {
         FileUtils.createFile(file);
         try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8)) {
-            Gson gson = pretty ? new GsonBuilder().setPrettyPrinting().create() : new Gson();
+            Gson gson = pretty ? new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create() : new GsonBuilder().disableHtmlEscaping().create();
             gson.toJson(this.getCopy(), outputStreamWriter);
         } catch (IOException ignore) {
         }
