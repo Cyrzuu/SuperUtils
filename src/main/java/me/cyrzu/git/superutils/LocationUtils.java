@@ -22,7 +22,7 @@ public class LocationUtils {
     }
 
     @Nullable
-    @Contract("_, true -> null; _, false -> !null")
+    @Contract("_, false -> !null")
     public static String serialize(@NotNull Location location, boolean needWorld) {
         return LocationUtils.serialize(location, 3, needWorld);
     }
@@ -33,14 +33,14 @@ public class LocationUtils {
     }
 
     @Nullable
-    @Contract("_, _, true -> null; _, _, false -> !null")
+    @Contract("_, _, false -> !null")
     public static String serialize(@NotNull Location location, int round, boolean needWorld) {
         JsonObject object = LocationUtils.serializeJsonObject(location, round, needWorld);
         return object != null ? object.toString() : null;
     }
 
     @Nullable
-    @Contract("_, _, true -> null; _, _, false -> !null")
+    @Contract("_, _, false -> !null")
     public static JsonObject serializeJsonObject(@NotNull Location location, int round, boolean needWorld) {
         World world = location.getWorld();
         if(world == null && needWorld) {
