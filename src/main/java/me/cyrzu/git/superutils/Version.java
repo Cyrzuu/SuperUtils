@@ -41,6 +41,7 @@ public enum Version {
         return version.isCurrent() || getCurrentVersion().isHigher(version);
     }
 
+
     public static boolean isAbove(@NotNull Version version) {
         return getCurrentVersion().isHigher(version);
     }

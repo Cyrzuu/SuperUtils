@@ -10,9 +10,9 @@ import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ColorableArmorMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -290,8 +290,13 @@ public class StackBuilder implements Cloneable {
             damageable.setUnbreakable(unbreakable);
         }
 
-        if(itemMeta instanceof ColorableArmorMeta colorable && this.dyeColor != -1) {
-            colorable.setColor(Color.fromRGB(this.dyeColor));
+
+        if(this.dyeColor != -1) {
+            if(Version.isAtLeast(Version.v1_19_R3) && itemMeta instanceof org.bukkit.inventory.meta.ColorableArmorMeta colorable) {
+                colorable.setColor(Color.fromRGB(this.dyeColor));
+            } else if(itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
+                leatherArmorMeta.setColor(Color.fromRGB(this.dyeColor));
+            }
         }
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
