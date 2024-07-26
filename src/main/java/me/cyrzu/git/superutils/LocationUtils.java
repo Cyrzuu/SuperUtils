@@ -122,7 +122,8 @@ public class LocationUtils {
             return def;
         }
 
-        World world = Bukkit.getWorld(reader.getString("world", "world"));
+        String worldName = reader.getString("world");
+        World world = worldName != null ? Bukkit.getWorld(worldName) : null;
         if(world == null) {
             return def;
         }
