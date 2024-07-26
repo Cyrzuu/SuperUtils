@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,12 +31,12 @@ public interface PluginCommand {
     default void execute(@NotNull Player player, @NotNull CommandContext context) { }
 
     @NotNull
-    default List<String> tabComplete(@NotNull Player player, @NotNull CommandContext context) {
+    default Collection<String> tabComplete(@NotNull Player player, @NotNull CommandContext context) {
         return new ArrayList<>();
     }
 
     @NotNull
-    default List<String> tabComplete(@NotNull CommandSender sender, @NotNull CommandContext context) {
+    default Collection<String> tabComplete(@NotNull CommandSender sender, @NotNull CommandContext context) {
         return new ArrayList<>();
     }
 
