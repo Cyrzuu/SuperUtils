@@ -188,31 +188,37 @@ class BukkitCommand extends Command {
     private List<String> tabComplete(@NotNull CommandSender sender, @NotNull String... args) {
         CommandContext context = new CommandContext(args);
 
-        Collection<String> tabs = new ArrayList<>(sender instanceof Player player ?
-                pluginCommand.tabComplete(player, context) :
-                pluginCommand.tabComplete(sender, context));
+        Collection<String> tabs;
+        if(sender instanceof Player player) {
+            tabs = pluginCommand.tabComplete(player, context);
 
-        if(sender instanceof Player && tabs.isEmpty()) {
-            tabs.addAll(pluginCommand.tabComplete(sender, context));
+            if(tabs != null && tabs.isEmpty()) {
+                tabs = pluginCommand.tabComplete(sender, context);
+            }
+        } else {
+            tabs = pluginCommand.tabComplete(sender, context);
         }
 
         String arg = context.get(context.size() - 1, "");
-        return tabs.stream().filter(tab -> arg.isEmpty() || tab.toLowerCase().startsWith(arg.toLowerCase())).toList();
+        return tabs == null ? Collections.emptyList() : tabs.stream().filter(tab -> arg.isEmpty() || tab.toLowerCase().startsWith(arg.toLowerCase())).toList();
     }
 
     private List<String> tabComplete(@NotNull CommandSender sender, @NotNull SubCommand subCommand, @NotNull String... args) {
         CommandContext context = new CommandContext(Arrays.copyOfRange(args, 1, args.length));
 
-        List<String> tabs = sender instanceof Player player ?
-            subCommand.tabComplete(player, context) :
-            subCommand.tabComplete(sender, context);
+        Collection<String> tabs;
+        if(sender instanceof Player player) {
+            tabs = subCommand.tabComplete(player, context);
 
-        if(sender instanceof Player && tabs.isEmpty()) {
-            tabs.addAll(pluginCommand.tabComplete(sender, context));
+            if(tabs != null && tabs.isEmpty()) {
+                tabs = subCommand.tabComplete(sender, context);
+            }
+        } else {
+            tabs = subCommand.tabComplete(sender, context);
         }
 
         String arg = context.get(context.size() - 1, "");
-        return tabs.stream().filter(tab -> arg.isEmpty() || tab.toLowerCase().startsWith(arg.toLowerCase())).toList();
+        return tabs == null ? Collections.emptyList() : tabs.stream().filter(tab -> arg.isEmpty() || tab.toLowerCase().startsWith(arg.toLowerCase())).toList();
     }
 
 }

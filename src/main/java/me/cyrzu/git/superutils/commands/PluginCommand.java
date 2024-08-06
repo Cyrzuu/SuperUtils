@@ -6,11 +6,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public interface PluginCommand {
 
@@ -30,14 +28,14 @@ public interface PluginCommand {
 
     default void execute(@NotNull Player player, @NotNull CommandContext context) { }
 
-    @NotNull
+    @Nullable
     default Collection<String> tabComplete(@NotNull Player player, @NotNull CommandContext context) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
-    @NotNull
+    @Nullable
     default Collection<String> tabComplete(@NotNull CommandSender sender, @NotNull CommandContext context) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     default void help(@NotNull CommandSender sender) { }

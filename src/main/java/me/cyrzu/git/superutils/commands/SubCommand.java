@@ -19,7 +19,7 @@ public abstract class SubCommand {
     public org.bukkit.permissions.Permission permission;
 
     @NotNull
-    private final CooldownManager cooldown = new CooldownManager();
+    private final CooldownManager<UUID> cooldown = new CooldownManager<>();
 
     public SubCommand() {
         String permission = this.getPermission();
@@ -52,14 +52,14 @@ public abstract class SubCommand {
 
     public void execute(@NotNull Player player, @NotNull CommandContext context) { }
 
-    @NotNull
-    public List<String> tabComplete(@NotNull Player player, @NotNull CommandContext context) {
-        return new ArrayList<>();
+    @Nullable
+    public Collection<String> tabComplete(@NotNull Player player, @NotNull CommandContext context) {
+        return Collections.emptyList();
     }
 
-    @NotNull
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull CommandContext context) {
-        return new ArrayList<>();
+    @Nullable
+    public Collection<String> tabComplete(@NotNull CommandSender sender, @NotNull CommandContext context) {
+        return Collections.emptyList();
     }
 
     public void usage(@NotNull CommandSender sender) { }
@@ -73,20 +73,20 @@ public abstract class SubCommand {
         return "";
     }
 
-    protected final void setCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
-        this.cooldown.setCooldown(uuid, time, unit);
-    }
-
     protected final void setCooldown(@NotNull Player player, int time, @NotNull TimeUnit unit) {
-        this.cooldown.setCooldown(player, time, unit);
+        this.setCooldown(player.getUniqueId(), time, unit);
     }
 
-    protected final boolean hasCooldown(@NotNull UUID uuid) {
-        return this.cooldown.hasCooldown(uuid);
+    protected final void setCooldown(@NotNull UUID uuid, int time, @NotNull TimeUnit unit) {
+        cooldown.setCooldown(uuid, time, unit);
     }
 
     protected final boolean hasCooldown(@NotNull Player player) {
-        return this.cooldown.hasCooldown(player);
+        return this.hasCooldown(player.getUniqueId());
+    }
+
+    protected final boolean hasCooldown(@NotNull UUID uuid) {
+        return cooldown.hasCooldown(uuid);
     }
 
 }
