@@ -95,18 +95,39 @@ public class LocationUtils {
         return object.toString();
     }
 
-    @NotNull
-    public static String serializeBlockNoWorld(@NotNull Location location, int round) {
-        return LocationUtils.serializeBlockNoWorldJsonObject(location, round).toString();
+    @Nullable
+    public static JsonObject serializeBlockJsonObject(@NotNull Location location) {
+        return LocationUtils.serializeBlockJsonObject(location, null);
     }
 
-    @NotNull
-    public static JsonObject serializeBlockNoWorldJsonObject(@NotNull Location location, int round) {
+    @Nullable
+    @Contract("_, !null -> !null")
+    public static JsonObject serializeBlockJsonObject(@NotNull Location location, @Nullable JsonObject def) {
+        World world = location.getWorld();
+        if(world == null) {
+            return def;
+        }
+
         return new JsonWriter()
+                .set("world", world.getName())
                 .set("x", location.getBlockX())
                 .set("y", location.getBlockY())
                 .set("z", location.getBlockZ())
                 .getCopy();
+    }
+
+    @NotNull
+    public static String serializeBlockNoWorld(@NotNull Location location) {
+        return LocationUtils.serializeBlockNoWorldJsonObject(location).toString();
+    }
+
+    @NotNull
+    public static JsonObject serializeBlockNoWorldJsonObject(@NotNull Location location) {
+        return new JsonWriter()
+            .set("x", location.getBlockX())
+            .set("y", location.getBlockY())
+            .set("z", location.getBlockZ())
+            .getCopy();
     }
 
     @Nullable
