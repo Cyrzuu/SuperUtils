@@ -123,9 +123,13 @@ public class StackBuilder implements Cloneable {
             this.lore.addAll(lore);
         }
 
-        if(itemMeta instanceof Damageable damageable && damageable.getDamage() > 0) {
+        if(itemMeta instanceof Damageable damageable) {
             this.unbreakable = damageable.isUnbreakable();
-            this.damage = damageable.getDamage();
+
+            int damage = damageable.getDamage();
+            if(damage > 0) {
+                this.damage = damageable.getDamage();
+            }
         }
 
         if(itemMeta.hasCustomModelData()) {
