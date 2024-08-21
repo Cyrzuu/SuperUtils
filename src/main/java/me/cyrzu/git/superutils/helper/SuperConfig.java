@@ -505,6 +505,8 @@ public class SuperConfig {
                       "example2": {
                         "type": "player head",
                         "head_texture": "95f7fa5de933e26bdc36800099f752f65bce135a003cb050b1537b75026f816c",
+                        "rarity": "epic",
+                        "maxstacksize": 2,
                         "flags": [
                           "ALL"
                         ]

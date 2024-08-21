@@ -38,7 +38,7 @@ public enum Version {
     }
 
     public static boolean isAtLeast(@NotNull Version version) {
-        return version.isCurrent() || getCurrentVersion().isHigher(version);
+        return version.isCurrent() || Version.getCurrentVersion().isHigher(version);
     }
 
 

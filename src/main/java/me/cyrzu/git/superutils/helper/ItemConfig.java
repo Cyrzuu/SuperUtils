@@ -3,6 +3,7 @@ package me.cyrzu.git.superutils.helper;
 import lombok.Getter;
 import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.ItemUtils;
+import me.cyrzu.git.superutils.Rarity;
 import me.cyrzu.git.superutils.StackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -33,6 +34,8 @@ public class ItemConfig {
         builder.setUnbreakable(reader.getBoolean("unbreakable", false));
         builder.setDamage(reader.getInt("damage"));
         builder.setDyeColor(reader.getInt("dyecolor"));
+        builder.setRarity(reader.getEnum("rarity", Rarity.class));
+        builder.setMaxStackSize(reader.getInt("maxstacksize", builder.getMaterial().getMaxStackSize()));
 
         List<ItemFlag> flags = reader.getListString("flags").stream()
                 .map(value -> EnumUtils.getEnum(value, ItemFlag.class))
