@@ -73,7 +73,8 @@ public class StackBuilder implements Cloneable {
     private int customModelData = -1;
 
     @Getter
-    private int damage = -1;
+    @Nullable
+    private Integer damage;
 
     @Getter
     private int dyeColor = -1;
@@ -122,7 +123,7 @@ public class StackBuilder implements Cloneable {
             this.lore.addAll(lore);
         }
 
-        if(itemMeta instanceof Damageable damageable) {
+        if(itemMeta instanceof Damageable damageable && damageable.getDamage() > 0) {
             this.unbreakable = damageable.isUnbreakable();
             this.damage = damageable.getDamage();
         }
@@ -328,7 +329,7 @@ public class StackBuilder implements Cloneable {
         itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
 
         if(itemMeta instanceof Damageable damageable) {
-            if(damage >= 0) {
+            if(damage != null && damage >= 0) {
                 damageable.setDamage(damage);
             }
 
@@ -408,7 +409,7 @@ public class StackBuilder implements Cloneable {
         itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
 
         if(itemMeta instanceof Damageable damageable) {
-            if(damage >= 0) {
+            if(damage != null && damage >= 0) {
                 damageable.setDamage(damage);
             }
 
