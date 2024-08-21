@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -69,12 +68,19 @@ public class StackBuilder implements Cloneable {
     @Getter
     private int dyeColor = -1;
 
+    @Getter
+    @Nullable
+    private Integer maxStackSize;
+
     private final Map<Enchantment, Integer> enchantments;
 
     private final Set<ItemFlag> flags;
 
     @Nullable
     private PlayerProfile headTexture;
+
+    @Nullable
+    private Rarity rarity;
 
     public StackBuilder(@NotNull Material material) {
         this(new ItemStack(material));
@@ -111,6 +117,17 @@ public class StackBuilder implements Cloneable {
         if(itemMeta.hasCustomModelData()) {
             this.customModelData = itemMeta.getCustomModelData();
         }
+
+        if(Version.isAtLeast(Version.v1_20_R4)) {
+            if(itemMeta.hasRarity()) {
+                this.rarity = Rarity.getRarity(itemMeta.getRarity());
+            }
+
+            if(itemMeta.hasMaxStackSize()) {
+                this.maxStackSize = itemMeta.getMaxStackSize();
+            }
+        }
+
     }
 
     public StackBuilder setName(String displayName) {
@@ -269,6 +286,16 @@ public class StackBuilder implements Cloneable {
         return this;
     }
 
+    public StackBuilder setMaxStackSize(@Nullable Integer maxStackSize) {
+        this.maxStackSize = maxStackSize;
+        return this;
+    }
+
+    public StackBuilder setRarity(@Nullable Rarity rarity) {
+        this.rarity = rarity;
+        return this;
+    }
+
     @NotNull
     public ItemStack build() {
         if(material.isAir()) {
@@ -301,8 +328,16 @@ public class StackBuilder implements Cloneable {
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
+        if(this.rarity != null && Version.isAtLeast(Version.v1_20_R4)) {
+            itemMeta.setRarity(this.rarity.getRarity());
+        }
+
+        if(this.maxStackSize != null && this.maxStackSize > 0 && Version.isAtLeast(Version.v1_20_R4)) {
+            itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+        }
+
         ItemStack stack = new ItemStack(material);
-        stack.setAmount(Math.min(amount, 64));
+        stack.setAmount(Math.min(amount, 99));
         stack.setItemMeta(itemMeta);
         stack.addUnsafeEnchantments(enchantments);
 
@@ -359,6 +394,14 @@ public class StackBuilder implements Cloneable {
         }
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
+
+        if(this.rarity != null && Version.isAtLeast(Version.v1_20_R4)) {
+            itemMeta.setRarity(this.rarity.getRarity());
+        }
+
+        if(this.maxStackSize != null && this.maxStackSize > 0 && Version.isAtLeast(Version.v1_20_R4)) {
+            itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+        }
 
         ItemStack stack = new ItemStack(material);
         stack.setAmount(Math.min(amount, 64));
@@ -443,6 +486,8 @@ public class StackBuilder implements Cloneable {
                 case "unbreakable", "unbr", "unb","u" -> builder.setUnbreakable(Boolean.parseBoolean(value));
                 case "flag", "flags","f" -> builder.setFlags(value.split(","));
                 case "head", "head_texture","skull","h" -> builder.setHeadTexture(value);
+                case "maxstack", "maxstacksize" -> builder.setMaxStackSize(NumberUtils.parseInteger(value, material.getMaxStackSize()));
+                case "rarity", "rare" -> builder.setRarity(EnumUtils.getEnum(value, Rarity.class));
                 case "enchant", "ench", "enchantment","e" -> {
                     String[] ench = value.split(";");
                     if (ench.length < 2) {

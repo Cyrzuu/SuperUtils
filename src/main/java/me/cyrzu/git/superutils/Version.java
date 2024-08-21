@@ -20,7 +20,7 @@ public enum Version {
     v1_20_R2("1.20.2"),
     v1_20_R3("1.20.3/1.20.4"),
     v1_20_R4("1.20.5/1.20.6"),
-    v1_21_R1("1.21"),
+    v1_21_R1("1.21/1.21.1"),
     UNKNOWN("Unknown");
 
     public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackage().getName();
@@ -43,7 +43,7 @@ public enum Version {
 
 
     public static boolean isAbove(@NotNull Version version) {
-        return getCurrentVersion().isHigher(version);
+        return Version.getCurrentVersion().isHigher(version);
     }
 
     public boolean isHigher(@NotNull Version version) {
@@ -86,7 +86,7 @@ public enum Version {
                 case "1.20.2" -> Version.v1_20_R2;
                 case "1.20.3", "1.20.4" -> Version.v1_20_R3;
                 case "1.20.5", "1.20.6" -> Version.v1_20_R4;
-                case "1.21" -> Version.v1_21_R1;
+                case "1.21", "1.21.1" -> Version.v1_21_R1;
                 default -> UNKNOWN;
             };
         } else {
