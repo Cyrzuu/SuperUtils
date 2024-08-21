@@ -42,12 +42,16 @@ public class ItemConfig {
                 .filter(Objects::nonNull).toList();
         builder.setFlags(flags);
 
-        JsonReader enchants = reader.getReader("enchants");
-        if(enchants != null) {
+        reader.getReader("enchants", enchants -> {
             for (String enchant : enchants.keySet()) {
                 builder.addEnchantment(enchant, enchants.getInt(enchant, 1));
             }
-        }
+        });
+
+        reader.getReader("nbt", nbts -> nbts.getKeysWithValue().forEach((k, v) -> {
+            String value = v.getAsString();
+            builder.addNBT(k, value);
+        }));
 
         this.builder = builder;
         this.item = builder.build();

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.*;
 import me.cyrzu.git.superutils.EnumUtils;
 import me.cyrzu.git.superutils.FileUtils;
-import me.cyrzu.git.superutils.LocationUtils;
 import me.cyrzu.git.superutils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,7 +43,17 @@ public class JsonReader {
     }
 
     @NotNull
-    public Map<String, JsonReader> getKeyValues() {
+    public Map<String, JsonReader> getKeysWithReader(@NotNull String path) {
+        JsonReader reader = this.getReader(path);
+        if(reader == null) {
+            return Collections.emptyMap();
+        }
+
+        return reader.getKeysWithReader();
+    }
+
+    @NotNull
+    public Map<String, JsonReader> getKeysWithReader() {
         Map<String, JsonReader> reader = new HashMap<>();
 
         Set<String> keys = this.keySet();
@@ -58,6 +67,32 @@ public class JsonReader {
         }
 
         return ImmutableMap.copyOf(reader);
+    }
+
+    @NotNull
+    public Map<String, JsonPrimitive> getKeysWithValue(@NotNull String path) {
+        JsonReader reader = this.getReader(path);
+        if(reader == null) {
+            return Collections.emptyMap();
+        }
+
+        return reader.getKeysWithValue();
+    }
+
+    @NotNull
+    public Map<String, JsonPrimitive> getKeysWithValue() {
+        Map<String, JsonPrimitive> primatives = new HashMap<>();
+
+        for (String key: this.keySet()) {
+            JsonElement jsonElement = this.get(key);
+            if(!(jsonElement instanceof JsonPrimitive object)) {
+                continue;
+            }
+
+            primatives.put(key, object);
+        }
+
+        return primatives;
     }
 
     @Nullable
@@ -305,9 +340,18 @@ public class JsonReader {
         return uuid != null ? uuid : def;
     }
 
+    public void getReader(@NotNull String path, @NotNull Consumer<JsonReader> fun) {
+        JsonReader reader = this.getReader(path);
+        if(reader == null) {
+            return;
+        }
+
+        fun.accept(reader);
+    }
+
     @Nullable
     public JsonReader getReader(@NotNull String path) {
-        return this.getReader(path, null);
+        return this.getReader(path, (JsonReader) null);
     }
 
     @Nullable

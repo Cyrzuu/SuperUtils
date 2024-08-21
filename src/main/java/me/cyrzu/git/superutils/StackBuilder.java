@@ -2,6 +2,8 @@ package me.cyrzu.git.superutils;
 
 import lombok.Getter;
 import me.cyrzu.git.superutils.color.ColorUtils;
+import me.cyrzu.git.superutils.helper.BukkitNBT;
+import me.cyrzu.git.superutils.helper.Pair;
 import me.cyrzu.git.superutils.helper.ReplaceBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.Contract;
@@ -25,6 +28,13 @@ import java.util.*;
 import java.util.List;
 
 public class StackBuilder implements Cloneable {
+
+    @Nullable
+    private static BukkitNBT BUKKIT_NBT;
+
+    public static void setBukkitNBT(@NotNull Plugin plugin) {
+        StackBuilder.BUKKIT_NBT = new BukkitNBT(plugin);
+    }
 
     @NotNull
     private static final ItemMeta DEFAULT_META;
@@ -81,6 +91,9 @@ public class StackBuilder implements Cloneable {
 
     @Nullable
     private Rarity rarity;
+
+    @NotNull
+    private final List<Pair<String, String>> persistentData = new ArrayList<>();
 
     public StackBuilder(@NotNull Material material) {
         this(new ItemStack(material));
@@ -271,6 +284,11 @@ public class StackBuilder implements Cloneable {
         return this;
     }
 
+    public StackBuilder addNBT(@NotNull String key, @NotNull String value) {
+        persistentData.add(new Pair<>(key, value));
+        return this;
+    }
+
     public <T, Z> StackBuilder addPersistentData(@NotNull NamespacedKey key, @NotNull PersistentDataType<T, Z> type, @NotNull Z value) {
         itemMeta.getPersistentDataContainer().set(key, type, value);
         return this;
@@ -346,6 +364,10 @@ public class StackBuilder implements Cloneable {
             stack.setItemMeta(skullMeta);
         }
 
+        if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
+            persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), pair.value()));
+        }
+
         return stack;
     }
 
@@ -411,6 +433,10 @@ public class StackBuilder implements Cloneable {
         if(headTexture != null && itemMeta instanceof SkullMeta skullMeta) {
             skullMeta.setOwnerProfile(headTexture);
             stack.setItemMeta(skullMeta);
+        }
+
+        if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
+            persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), replace.replaceMessage(pair.value(), objects)));
         }
 
         return stack;
@@ -488,13 +514,21 @@ public class StackBuilder implements Cloneable {
                 case "head", "head_texture","skull","h" -> builder.setHeadTexture(value);
                 case "maxstack", "maxstacksize" -> builder.setMaxStackSize(NumberUtils.parseInteger(value, material.getMaxStackSize()));
                 case "rarity", "rare" -> builder.setRarity(EnumUtils.getEnum(value, Rarity.class));
-                case "enchant", "ench", "enchantment","e" -> {
+                case "enchant", "ench", "enchantment", "e" -> {
                     String[] ench = value.split(";");
                     if (ench.length < 2) {
                         continue;
                     }
 
                     builder.addEnchantment(ench[0], NumberUtils.parseInteger(ench[1]));
+                }
+                case "nbt", "tag", "data" -> {
+                    String[] nbt = value.split(";");
+                    if (nbt.length < 2) {
+                        continue;
+                    }
+
+                    builder.addNBT(nbt[0], nbt[1]);
                 }
             }
         }
