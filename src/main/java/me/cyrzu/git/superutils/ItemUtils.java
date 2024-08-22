@@ -18,10 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -119,16 +116,16 @@ public class ItemUtils {
     @NotNull
     public static String getDisplayName(@NotNull ItemStack stack) {
         ItemMeta itemMeta = stack.getItemMeta();
-        return itemMeta != null && itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : stack.getType().name().toLowerCase().replace("_", " ");
+        return itemMeta != null && itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : EnumUtils.capitalize(stack.getType());
     }
 
     @NotNull
     public static List<String> getLore(@NotNull ItemStack stack) {
         ItemMeta itemMeta = stack.getItemMeta();
-        return itemMeta != null && itemMeta.getLore() != null ? itemMeta.getLore() : new ArrayList<>();
+        return itemMeta != null && itemMeta.getLore() != null ? itemMeta.getLore() : Collections.emptyList();
     }
 
-    public static void setItemMeta(@NotNull ItemStack stack, @NotNull Consumer<ItemMeta> function) {
+    public static void setItemMeta(@NotNull ItemStack stack, @NotNull Consumer<@NotNull ItemMeta> function) {
         if(stack.getType().isAir()) {
             return;
         }
