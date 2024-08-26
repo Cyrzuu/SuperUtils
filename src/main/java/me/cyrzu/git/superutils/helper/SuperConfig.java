@@ -58,6 +58,10 @@ public class SuperConfig {
 
     public final boolean append;
 
+    public SuperConfig(@NotNull Plugin plugin) {
+        this(plugin, "config.yml", new String[0]);
+    }
+
     public SuperConfig(@NotNull Plugin plugin, @NotNull String resource) {
         this(plugin, resource, new String[0]);
     }
@@ -173,6 +177,12 @@ public class SuperConfig {
             .map(LocationUtils::deserialize)
             .filter(Objects::nonNull)
             .toList();
+    }
+
+    @NotNull
+    public List<BridgeResult> getListBridge(@NotNull String path) {
+        List<Map<?, ?>> mapList = config.getMapList(path);
+        return mapList.stream().map(BridgeResult::new).toList();
     }
 
     @Nullable
