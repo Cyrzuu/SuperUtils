@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 
 public class StackBuilder implements Cloneable {
 
@@ -442,6 +443,76 @@ public class StackBuilder implements Cloneable {
 
         if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
             persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), replace.replaceMessage(pair.value(), objects)));
+        }
+
+        return stack;
+    }
+
+    @NotNull
+    public ItemStack build(@NotNull Function<String, String> function) {
+        Material material = this.material;
+
+        if(material == Material.AIR || !material.isItem()) {
+            return new ItemStack(Material.AIR);
+        }
+
+        itemMeta.setDisplayName(displayName == null ?
+                null :
+                ColorUtils.parseText(function.apply(displayName)));
+
+        List<String> lore = new ArrayList<>(this.lore.stream()
+                .filter(line -> line.isBlank() || !function.apply(line).isEmpty())
+                .map(function).toList());
+
+        for (String s : List.copyOf(lore)) {
+            if(!s.contains("\n")) {
+                continue;
+            }
+
+            int i = lore.indexOf(s);
+            String[] split = s.split("\n");
+            if(i == -1) {
+                continue;
+            }
+
+            lore.remove(i);
+            lore.addAll(i, Arrays.asList(split));
+        }
+
+        itemMeta.setLore(lore);
+
+        itemMeta.setCustomModelData(customModelData >= 0 ? customModelData : null);
+
+        if(itemMeta instanceof Damageable damageable) {
+            if(damage != null && damage >= 0) {
+                damageable.setDamage(damage);
+            }
+
+            damageable.setUnbreakable(unbreakable);
+        }
+
+        itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
+
+        if(this.rarity != null && Version.isAtLeast(Version.v1_20_R4)) {
+            itemMeta.setRarity(this.rarity.getRarity());
+        }
+
+        if(this.maxStackSize != null && this.maxStackSize > 0 && Version.isAtLeast(Version.v1_20_R4)) {
+            itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+        }
+
+        ItemStack stack = new ItemStack(material);
+        stack.setAmount(Math.min(amount, 64));
+        stack.setItemMeta(itemMeta);
+        stack.addUnsafeEnchantments(enchantments);
+
+        if(headTexture != null && itemMeta instanceof SkullMeta skullMeta) {
+            skullMeta.setOwnerProfile(headTexture);
+            stack.setItemMeta(skullMeta);
+        }
+
+        if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
+            persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), function.apply(pair.value())));
         }
 
         return stack;
