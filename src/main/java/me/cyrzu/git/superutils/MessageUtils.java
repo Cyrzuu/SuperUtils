@@ -77,31 +77,31 @@ public class MessageUtils {
 
 
 
-    public void sendSuccess(@NotNull Player player, String message, @NotNull Object... format) {
-        if(format.length == 0) {
+    public void sendSuccess(@NotNull Player player, String message, Object @NotNull ... args) {
+        if(args.length == 0) {
             player.sendMessage((SUCCESS == null ? ColorUtils.SUCCESS_COLOR : SUCCESS) + message);
             return;
         }
 
-        player.sendMessage((SUCCESS == null ? ColorUtils.SUCCESS_COLOR : SUCCESS) + String.format(message));
+        player.sendMessage((SUCCESS == null ? ColorUtils.SUCCESS_COLOR : SUCCESS) + MessageUtils.format(message, args));
     }
 
-    public void sendWarning(@NotNull Player player, String message, @NotNull Object... format) {
-        if(format.length == 0) {
+    public void sendWarning(@NotNull Player player, String message, Object @NotNull ... args) {
+        if(args.length == 0) {
             player.sendMessage((WARNING == null ? ColorUtils.ERROR_COLOR : WARNING) + message);
             return;
         }
 
-        player.sendMessage((WARNING == null ? ColorUtils.ERROR_COLOR : WARNING) + String.format(message));
+        player.sendMessage((WARNING == null ? ColorUtils.ERROR_COLOR : WARNING) + MessageUtils.format(message, args));
     }
 
-    public void sendInfo(@NotNull Player player, String message, @NotNull Object... format) {
-        if(format.length == 0) {
+    public void sendInfo(@NotNull Player player, String message, Object @NotNull ... args) {
+        if(args.length == 0) {
             player.sendMessage((INFO == null ? ColorUtils.INFO_COLOR : INFO) + message);
             return;
         }
 
-        player.sendMessage((INFO == null ? ColorUtils.INFO_COLOR : INFO) + String.format(message));
+        player.sendMessage((INFO == null ? ColorUtils.INFO_COLOR : INFO) + MessageUtils.format(message, args));
     }
 
 
@@ -109,7 +109,7 @@ public class MessageUtils {
 
 
 
-    public void send(@NotNull CommandSender sender, String message, @NotNull Object... format) {
+    public void send(@NotNull CommandSender sender, String message, Object @NotNull ... format) {
         if(sender instanceof ConsoleCommandSender && LOGGER != null) {
             LOGGER.info(MessageUtils.parseStripMessage(message, format));
             return;
@@ -118,13 +118,13 @@ public class MessageUtils {
         sender.sendMessage(MessageUtils.parseMessage(message, format));
     }
 
-    public void send(@NotNull Player player, String message, @NotNull Object... format) {
+    public void send(@NotNull Player player, String message, Object @NotNull ... format) {
         player.sendMessage(MessageUtils.parseMessage(message, format));
     }
 
 
 
-    public void sendActionBar(@NotNull Player player, String message, @NotNull Object... format) {
+    public void sendActionBar(@NotNull Player player, String message, Object @NotNull ... format) {
         TextComponent textComponent = new TextComponent(MessageUtils.parseMessage(message, format));
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, textComponent);
     }
@@ -142,7 +142,7 @@ public class MessageUtils {
     }
 
     @NotNull
-    public String parseStripMessage(String message, @NotNull Object... format) {
+    public String parseStripMessage(String message, Object @NotNull ... format) {
         if(format != null && format.length > 0) {
             try {
                 message = message.formatted(format);
@@ -154,15 +154,21 @@ public class MessageUtils {
     }
 
     @NotNull
-    public String parseMessage(String message, @NotNull Object... format) {
-        if(format != null && format.length > 0) {
-            try {
-                message = message.formatted(format);
-            } catch (Exception ignore) {
-            }
+    public String parseMessage(String message, Object @NotNull ... args) {
+        if(args.length > 0) {
+            message = MessageUtils.format(message, args);
         }
 
         return ColorUtils.parseText(message);
+    }
+
+    @NotNull
+    public String format(@NotNull String message, @NotNull Object... args) {
+        try {
+            return String.format(message, args);
+        } catch (Exception ignored) {}
+
+        return message;
     }
 
 }
