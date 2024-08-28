@@ -30,6 +30,9 @@ public class ColorUtils {
     public static ChatColor ERROR_COLOR = ChatColor.of(new Color(204, 0, 0));
 
     @NotNull
+    public static ChatColor INFO_COLOR = ChatColor.of(new Color(204, 163, 0));
+
+    @NotNull
     public static ChatColor SUCCESS_COLOR = ChatColor.of(new Color(0, 204, 0));
 
     @NotNull
