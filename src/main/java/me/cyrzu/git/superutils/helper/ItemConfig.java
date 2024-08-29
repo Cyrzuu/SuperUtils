@@ -32,10 +32,13 @@ public class ItemConfig {
         builder.setCustomModelData(reader.getInt("custommodeldata", -1));
         builder.setAmount(reader.getInt("amount", 1));
         builder.setUnbreakable(reader.getBoolean("unbreakable", false));
-        builder.setDamage(reader.getInt("damage"));
+        reader.getAndRun("damage", Integer.class, builder::setDamage);
         builder.setDyeColor(reader.getInt("dyecolor"));
         builder.setRarity(reader.getEnum("rarity", Rarity.class));
         builder.setMaxStackSize(reader.getInt("maxstacksize", builder.getMaterial().getMaxStackSize()));
+
+        reader.getAndRun("hidetooltip", Boolean.class, builder::setHideTooltip);
+        reader.getAndRun("glow", Boolean.class, builder::setGlow);
 
         List<ItemFlag> flags = reader.getListString("flags").stream()
                 .map(value -> EnumUtils.getEnum(value, ItemFlag.class))

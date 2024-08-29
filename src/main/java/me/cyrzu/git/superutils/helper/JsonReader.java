@@ -372,8 +372,7 @@ public class JsonReader {
             function.accept(clazz.cast(JsonReader.parseObject(obj)));
         } else if(json instanceof JsonObject obj && clazz.equals(JsonObject.class)) {
             function.accept(clazz.cast(JsonReader.parseObject(obj)));
-        }
-        else if (json instanceof JsonPrimitive primitive) {
+        } else if (json instanceof JsonPrimitive primitive) {
             Object value = null;
 
             if (clazz.equals(String.class)) {

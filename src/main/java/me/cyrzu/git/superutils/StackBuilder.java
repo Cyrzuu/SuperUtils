@@ -97,6 +97,11 @@ public class StackBuilder implements Cloneable {
     @NotNull
     private final List<Pair<String, String>> persistentData = new ArrayList<>();
 
+    @Nullable
+    private Boolean hideToolTip;
+
+    private boolean glow;
+
     public StackBuilder(@NotNull Material material) {
         this(new ItemStack(material));
     }
@@ -144,6 +149,10 @@ public class StackBuilder implements Cloneable {
 
             if(itemMeta.hasMaxStackSize()) {
                 this.maxStackSize = itemMeta.getMaxStackSize();
+            }
+
+            if(itemMeta.isHideTooltip()) {
+                this.hideToolTip = itemMeta.isHideTooltip();
             }
         }
 
@@ -320,6 +329,16 @@ public class StackBuilder implements Cloneable {
         return this;
     }
 
+    public StackBuilder setHideTooltip(boolean hideTooltip) {
+        this.hideToolTip = hideTooltip;
+        return this;
+    }
+
+    public StackBuilder setGlow(boolean glow) {
+        this.glow = glow;
+        return this;
+    }
+
     @NotNull
     public ItemStack build() {
         if(material.isAir()) {
@@ -352,16 +371,27 @@ public class StackBuilder implements Cloneable {
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
-        if(this.rarity != null && Version.isAtLeast(Version.v1_20_R4)) {
-            itemMeta.setRarity(this.rarity.getRarity());
+        if(Version.isAtLeast(Version.v1_20_R4)) {
+            if(this.rarity != null) {
+                itemMeta.setRarity(rarity.getRarity());
+            }
+
+            if(this.maxStackSize != null && this.maxStackSize > 0) {
+                itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+            }
+
+            if(this.hideToolTip != null) {
+                itemMeta.setHideTooltip(this.hideToolTip);
+            }
         }
 
-        if(this.maxStackSize != null && this.maxStackSize > 0 && Version.isAtLeast(Version.v1_20_R4)) {
-            itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+        if(this.glow && !itemMeta.hasEnchant(Enchantment.UNBREAKING)) {
+            itemMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
         ItemStack stack = new ItemStack(material);
-        stack.setAmount(Math.min(amount, 99));
+        stack.setAmount(amount);
         stack.setItemMeta(itemMeta);
         stack.addUnsafeEnchantments(enchantments);
 
@@ -423,12 +453,18 @@ public class StackBuilder implements Cloneable {
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
-        if(this.rarity != null && Version.isAtLeast(Version.v1_20_R4)) {
-            itemMeta.setRarity(this.rarity.getRarity());
-        }
+        if(Version.isAtLeast(Version.v1_20_R4)) {
+            if(this.rarity != null) {
+                itemMeta.setRarity(rarity.getRarity());
+            }
 
-        if(this.maxStackSize != null && this.maxStackSize > 0 && Version.isAtLeast(Version.v1_20_R4)) {
-            itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+            if(this.maxStackSize != null && this.maxStackSize > 0) {
+                itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+            }
+
+            if(this.hideToolTip != null) {
+                itemMeta.setHideTooltip(this.hideToolTip);
+            }
         }
 
         ItemStack stack = new ItemStack(material);
@@ -493,12 +529,18 @@ public class StackBuilder implements Cloneable {
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
-        if(this.rarity != null && Version.isAtLeast(Version.v1_20_R4)) {
-            itemMeta.setRarity(this.rarity.getRarity());
-        }
+        if(Version.isAtLeast(Version.v1_20_R4)) {
+            if(this.rarity != null) {
+                itemMeta.setRarity(rarity.getRarity());
+            }
 
-        if(this.maxStackSize != null && this.maxStackSize > 0 && Version.isAtLeast(Version.v1_20_R4)) {
-            itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+            if(this.maxStackSize != null && this.maxStackSize > 0) {
+                itemMeta.setMaxStackSize(Math.min(99, this.maxStackSize));
+            }
+
+            if(this.hideToolTip != null) {
+                itemMeta.setHideTooltip(this.hideToolTip);
+            }
         }
 
         ItemStack stack = new ItemStack(material);
@@ -606,6 +648,8 @@ public class StackBuilder implements Cloneable {
 
                     builder.addNBT(nbt[0], nbt[1]);
                 }
+                case "hidetooltip", "htt" -> builder.setHideTooltip(Boolean.parseBoolean(value));
+                case "glow", "glowing" -> builder.setGlow(Boolean.parseBoolean(value));
             }
         }
 
