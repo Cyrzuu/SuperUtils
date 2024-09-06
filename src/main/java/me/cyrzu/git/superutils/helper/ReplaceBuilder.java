@@ -3,6 +3,7 @@ package me.cyrzu.git.superutils.helper;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,24 +28,24 @@ public class ReplaceBuilder {
         return this;
     }
 
-    public String replaceMessage(@NotNull String message, @NotNull Object... args) {
+    public String replaceMessage(@NotNull String message, Object... args) {
         if(this.replacment.size() > args.length) {
             return message;
         }
 
         int index = 0;
         for (String s : replacment) {
-            message = message.replace(s, args[index++].toString());
+            message = message.replace(s, String.valueOf(args[index++]));
         }
 
         return message;
     }
 
-    public void sendMessage(@NotNull Player player, @NotNull String message, @NotNull Object... args) {
+    public void sendMessage(@NotNull Player player, @NotNull String message, Object... args) {
         player.sendMessage(this.replaceMessage(message, args));
     }
 
-    public void sendMessage(@NotNull CommandSender sender, @NotNull String message, @NotNull Object... args) {
+    public void sendMessage(@NotNull CommandSender sender, @NotNull String message, Object... args) {
         sender.sendMessage(this.replaceMessage(message, args));
     }
 

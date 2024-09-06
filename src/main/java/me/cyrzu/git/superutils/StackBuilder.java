@@ -408,7 +408,7 @@ public class StackBuilder implements Cloneable {
     }
 
     @NotNull
-    public ItemStack build(@NotNull ReplaceBuilder replace, @NotNull Object... objects) {
+    public ItemStack build(@NotNull ReplaceBuilder replace, Object... objects) {
         Material material = objects[objects.length - 1] instanceof Material mat ? mat : this.material;
 
         if(material == Material.AIR || !material.isItem()) {

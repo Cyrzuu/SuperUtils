@@ -33,7 +33,7 @@ public class MessageUtils {
         MessageUtils.SUCCESS = success != null ? ColorUtils.parseText(success) : null;
     }
 
-    public void sendSuccess(@NotNull CommandSender sender, String message, @NotNull Object... format) {
+    public void sendSuccess(@NotNull CommandSender sender, String message, Object... format) {
         if(sender instanceof ConsoleCommandSender && LOGGER != null) {
             LOGGER.info(MessageUtils.parseStripMessage(message, format));
             return;
@@ -47,7 +47,7 @@ public class MessageUtils {
         MessageUtils.send(sender, ColorUtils.SUCCESS_COLOR + message, format);
     }
 
-    public void sendWarning(@NotNull CommandSender sender, String message, @NotNull Object... format) {
+    public void sendWarning(@NotNull CommandSender sender, String message, Object... format) {
         if(sender instanceof ConsoleCommandSender && LOGGER != null) {
             LOGGER.severe(MessageUtils.parseStripMessage(message, format));
             return;
@@ -61,7 +61,7 @@ public class MessageUtils {
         MessageUtils.send(sender, ColorUtils.ERROR_COLOR + message, format);
     }
 
-    public void sendInfo(@NotNull CommandSender sender, String message, @NotNull Object... format) {
+    public void sendInfo(@NotNull CommandSender sender, String message, Object... format) {
         if(sender instanceof ConsoleCommandSender && LOGGER != null) {
             LOGGER.warning(MessageUtils.parseStripMessage(message, format));
             return;
@@ -77,7 +77,7 @@ public class MessageUtils {
 
 
 
-    public void sendSuccess(@NotNull Player player, String message, Object @NotNull ... args) {
+    public void sendSuccess(@NotNull Player player, String message, Object... args) {
         if(args.length == 0) {
             player.sendMessage((SUCCESS == null ? ColorUtils.SUCCESS_COLOR : SUCCESS) + message);
             return;
@@ -86,7 +86,7 @@ public class MessageUtils {
         player.sendMessage((SUCCESS == null ? ColorUtils.SUCCESS_COLOR : SUCCESS) + MessageUtils.format(message, args));
     }
 
-    public void sendWarning(@NotNull Player player, String message, Object @NotNull ... args) {
+    public void sendWarning(@NotNull Player player, String message, Object... args) {
         if(args.length == 0) {
             player.sendMessage((WARNING == null ? ColorUtils.ERROR_COLOR : WARNING) + message);
             return;
@@ -95,7 +95,7 @@ public class MessageUtils {
         player.sendMessage((WARNING == null ? ColorUtils.ERROR_COLOR : WARNING) + MessageUtils.format(message, args));
     }
 
-    public void sendInfo(@NotNull Player player, String message, Object @NotNull ... args) {
+    public void sendInfo(@NotNull Player player, String message, Object... args) {
         if(args.length == 0) {
             player.sendMessage((INFO == null ? ColorUtils.INFO_COLOR : INFO) + message);
             return;
@@ -109,7 +109,7 @@ public class MessageUtils {
 
 
 
-    public void send(@NotNull CommandSender sender, String message, Object @NotNull ... format) {
+    public void send(@NotNull CommandSender sender, String message, Object... format) {
         if(sender instanceof ConsoleCommandSender && LOGGER != null) {
             LOGGER.info(MessageUtils.parseStripMessage(message, format));
             return;
@@ -118,13 +118,13 @@ public class MessageUtils {
         sender.sendMessage(MessageUtils.parseMessage(message, format));
     }
 
-    public void send(@NotNull Player player, String message, Object @NotNull ... format) {
+    public void send(@NotNull Player player, String message, Object... format) {
         player.sendMessage(MessageUtils.parseMessage(message, format));
     }
 
 
 
-    public void sendActionBar(@NotNull Player player, String message, Object @NotNull ... format) {
+    public void sendActionBar(@NotNull Player player, String message, Object... format) {
         TextComponent textComponent = new TextComponent(MessageUtils.parseMessage(message, format));
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, textComponent);
     }
@@ -142,7 +142,7 @@ public class MessageUtils {
     }
 
     @NotNull
-    public String parseStripMessage(String message, Object @NotNull ... format) {
+    public String parseStripMessage(String message, Object... format) {
         if(format != null && format.length > 0) {
             try {
                 message = message.formatted(format);
@@ -154,7 +154,7 @@ public class MessageUtils {
     }
 
     @NotNull
-    public String parseMessage(String message, Object @NotNull ... args) {
+    public String parseMessage(String message, Object... args) {
         if(args.length > 0) {
             message = MessageUtils.format(message, args);
         }
@@ -163,7 +163,7 @@ public class MessageUtils {
     }
 
     @NotNull
-    public String format(@NotNull String message, @NotNull Object... args) {
+    public String format(@NotNull String message, Object... args) {
         try {
             return String.format(message, args);
         } catch (Exception ignored) {}
