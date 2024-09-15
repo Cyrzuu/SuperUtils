@@ -31,7 +31,7 @@ public class ItemConfig {
         builder.setUnbreakable(reader.getBoolean("unbreakable", false));
         reader.getAndRun("damage", Integer.class, builder::setDamage);
 
-        if(Version.isAtLeast(Version.v1_19_R3)) {
+        if(Version.isAtLeast(Version.v1_20_R1)) {
             builder.setDyeColor(reader.getInt("dyecolor"));
         }
 

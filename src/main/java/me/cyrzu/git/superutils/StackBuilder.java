@@ -362,7 +362,7 @@ public class StackBuilder implements Cloneable {
 
 
         if(this.dyeColor != -1) {
-            if(Version.isAtLeast(Version.v1_19_R3) && itemMeta instanceof org.bukkit.inventory.meta.ColorableArmorMeta colorable) {
+            if(Version.isAtLeast(Version.v1_20_R1) && itemMeta instanceof org.bukkit.inventory.meta.ColorableArmorMeta colorable) {
                 colorable.setColor(Color.fromRGB(this.dyeColor));
             } else if(itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
                 leatherArmorMeta.setColor(Color.fromRGB(this.dyeColor));
@@ -453,6 +453,14 @@ public class StackBuilder implements Cloneable {
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
 
+        if(this.dyeColor != -1) {
+            if(Version.isAtLeast(Version.v1_20_R1) && itemMeta instanceof org.bukkit.inventory.meta.ColorableArmorMeta colorable) {
+                colorable.setColor(Color.fromRGB(this.dyeColor));
+            } else if(itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
+                leatherArmorMeta.setColor(Color.fromRGB(this.dyeColor));
+            }
+        }
+
         if(Version.isAtLeast(Version.v1_20_R4)) {
             if(this.rarity != null) {
                 itemMeta.setRarity(rarity.getRarity());
@@ -528,6 +536,14 @@ public class StackBuilder implements Cloneable {
         }
 
         itemMeta.addItemFlags(flags.toArray(ItemFlag[]::new));
+
+        if(this.dyeColor != -1) {
+            if(Version.isAtLeast(Version.v1_20_R1) && itemMeta instanceof org.bukkit.inventory.meta.ColorableArmorMeta colorable) {
+                colorable.setColor(Color.fromRGB(this.dyeColor));
+            } else if(itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
+                leatherArmorMeta.setColor(Color.fromRGB(this.dyeColor));
+            }
+        }
 
         if(Version.isAtLeast(Version.v1_20_R4)) {
             if(this.rarity != null) {
