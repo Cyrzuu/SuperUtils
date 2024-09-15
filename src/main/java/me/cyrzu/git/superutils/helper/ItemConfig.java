@@ -1,10 +1,7 @@
 package me.cyrzu.git.superutils.helper;
 
 import lombok.Getter;
-import me.cyrzu.git.superutils.EnumUtils;
-import me.cyrzu.git.superutils.ItemUtils;
-import me.cyrzu.git.superutils.Rarity;
-import me.cyrzu.git.superutils.StackBuilder;
+import me.cyrzu.git.superutils.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -33,11 +30,17 @@ public class ItemConfig {
         builder.setAmount(reader.getInt("amount", 1));
         builder.setUnbreakable(reader.getBoolean("unbreakable", false));
         reader.getAndRun("damage", Integer.class, builder::setDamage);
-        builder.setDyeColor(reader.getInt("dyecolor"));
-        builder.setRarity(reader.getEnum("rarity", Rarity.class));
-        builder.setMaxStackSize(reader.getInt("maxstacksize", builder.getMaterial().getMaxStackSize()));
 
-        reader.getAndRun("hidetooltip", Boolean.class, builder::setHideTooltip);
+        if(Version.isAtLeast(Version.v1_19_R3)) {
+            builder.setDyeColor(reader.getInt("dyecolor"));
+        }
+
+        if(Version.isAtLeast(Version.v1_20_R4)) {
+            builder.setRarity(reader.getEnum("rarity", Rarity.class));
+            builder.setMaxStackSize(reader.getInt("maxstacksize", builder.getMaterial().getMaxStackSize()));
+            reader.getAndRun("hidetooltip", Boolean.class, builder::setHideTooltip);
+        }
+
         reader.getAndRun("glow", Boolean.class, builder::setGlow);
 
         List<ItemFlag> flags = reader.getListString("flags").stream()
