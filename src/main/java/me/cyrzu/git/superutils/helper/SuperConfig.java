@@ -305,20 +305,21 @@ public class SuperConfig {
 
     @SneakyThrows
     public void reloadConfig() {
-        this.config = YamlConfiguration.loadConfiguration(this.file);
+        config = YamlConfiguration.loadConfiguration(this.file);
         InputStream resourceStream = plugin.getResource(resource);
         if(resourceStream == null) {
-            this.resourceConfig = new YamlConfiguration();
+            resourceConfig = new YamlConfiguration();
         } else {
             InputStreamReader resourceReader = new InputStreamReader(resourceStream, Charsets.UTF_8);
-            this.resourceConfig = YamlConfiguration.loadConfiguration(resourceReader);
+            resourceConfig = YamlConfiguration.loadConfiguration(resourceReader);
         }
 
         if(append) {
-            this.saveResource(this.config, this.resourceConfig, "");
+            this.saveResource(this.config, resourceConfig, "");
         }
 
-        this.config.save(this.file);
+        data.clear();
+        config.save(this.file);
         this.loadConfiguration(this.config, "");
     }
 
