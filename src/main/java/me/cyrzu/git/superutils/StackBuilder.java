@@ -2,9 +2,12 @@ package me.cyrzu.git.superutils;
 
 import lombok.Getter;
 import me.cyrzu.git.superutils.color.ColorUtils;
-import me.cyrzu.git.superutils.helper.BukkitNBT;
+import me.cyrzu.git.superutils.helper.nbt.BukkitNBT;
 import me.cyrzu.git.superutils.helper.Pair;
 import me.cyrzu.git.superutils.helper.ReplaceBuilder;
+import me.cyrzu.git.superutils.helper.nbt.ItemBukkitNBT;
+import me.cyrzu.git.superutils.helper.nbt.ItemMinecraftNBT;
+import me.cyrzu.git.superutils.helper.nbt.ItemNBT;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,11 +33,11 @@ import java.util.function.Function;
 
 public class StackBuilder implements Cloneable {
 
-    @Nullable
-    private static BukkitNBT BUKKIT_NBT;
+    @NotNull
+    private static ItemNBT BUKKIT_NBT = new ItemMinecraftNBT();
 
     public static void setBukkitNBT(@NotNull Plugin plugin) {
-        StackBuilder.BUKKIT_NBT = new BukkitNBT(plugin);
+        StackBuilder.BUKKIT_NBT = new ItemBukkitNBT(plugin);
     }
 
     @NotNull
@@ -400,7 +403,7 @@ public class StackBuilder implements Cloneable {
             stack.setItemMeta(skullMeta);
         }
 
-        if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
+        if(!persistentData.isEmpty()) {
             persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), pair.value()));
         }
 
@@ -485,7 +488,7 @@ public class StackBuilder implements Cloneable {
             stack.setItemMeta(skullMeta);
         }
 
-        if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
+        if(!persistentData.isEmpty()) {
             persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), replace.replaceMessage(pair.value(), objects)));
         }
 
@@ -569,7 +572,7 @@ public class StackBuilder implements Cloneable {
             stack.setItemMeta(skullMeta);
         }
 
-        if(BUKKIT_NBT != null && !persistentData.isEmpty()) {
+        if(!persistentData.isEmpty()) {
             persistentData.forEach(pair -> BUKKIT_NBT.set(stack, PersistentDataType.STRING, pair.key(), function.apply(pair.value())));
         }
 
