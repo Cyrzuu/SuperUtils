@@ -48,11 +48,12 @@ public class Message {
         JsonReader title = reader.getReader("title");
         this.title = title == null ? null : new Title(title);
 
-        JsonReader sound = reader.getReader("sound");
-        PlaySound playSound = PlaySound.defaultOf(reader.getString("playsound"));
-        this.sound = playSound != null ? playSound : sound == null ? null : new PlaySound(sound.getEnum("name", Sound.class, Sound.UI_BUTTON_CLICK),
-                sound.getDouble("volume", 1D),
-                sound.getDouble("pitch", 1D));
+        this.sound = null;
+        // JsonReader sound = reader.getReader("sound");
+        // PlaySound playSound = PlaySound.defaultOf(reader.getString("playsound"));
+        // this.sound = playSound != null ? playSound : sound == null ? null : new PlaySound(sound.getEnum("name", Sound.class, Sound.UI_BUTTON_CLICK),
+                // sound.getDouble("volume", 1D),
+                // sound.getDouble("pitch", 1D));
     }
 
     public void send(@NotNull CommandSender sender) {
